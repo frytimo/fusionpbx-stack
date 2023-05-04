@@ -193,7 +193,11 @@ if (!class_exists('registrations')) {
 				$registrations = $this->get($profile);
 
 			//set the count
-				$count = @sizeof($registrations);
+				if(!empty($registrations)) {
+					$count = \count($registrations);
+				} else {
+					$count = 0;
+				}
 
 			//return the registrations count
 				return $count;

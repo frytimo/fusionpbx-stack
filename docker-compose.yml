@@ -60,6 +60,9 @@ services:
     container_name: fpbx-php
     hostname: php
     restart: unless-stopped
+    depends_on:
+      - db
+      - fs
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://nginx/status/fpm"]
     extra_hosts:
