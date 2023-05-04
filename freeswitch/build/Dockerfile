@@ -47,7 +47,7 @@ RUN cd /usr/local/src/spandsp \
   && git checkout -b build \
   && ./bootstrap.sh \
   && ./configure --prefix=/usr \
-  && make -j$(nproc) \
+  && make -i -j$(nproc) \
   && make install
 
 #
@@ -59,7 +59,7 @@ RUN cd /usr/local/src/sofia-sip \
   && git checkout -b build \
   && ./bootstrap.sh \
   && ./configure --prefix=/usr \
-  && make -j$(nproc) \
+  && make -i -j$(nproc) \
   && make install
 
 #
@@ -114,7 +114,7 @@ RUN cd /usr/local/src/freeswitch \
 #
 # make and install freeswitch using all cores
 #
-RUN cd /usr/local/src/freeswitch && make -j$(nproc)
+RUN cd /usr/local/src/freeswitch && make -i -j$(nproc)
 RUN cd /usr/local/src/freeswitch && make install
 
 #
