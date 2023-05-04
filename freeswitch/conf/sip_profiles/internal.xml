@@ -1,0 +1,87 @@
+<profile name="internal">
+	<!-- http://wiki.freeswitch.org/wiki/Sofia_Configuration_Files -->
+	<!--aliases are other names that will work as a valid profile name for this profile-->
+	<aliases>
+		<!--
+		<alias name="default"/>
+		-->
+	</aliases>
+
+	<!-- Outbound Registrations -->
+	<gateways>
+		<X-PRE-PROCESS cmd="include" data="internal/*.xml"/>
+	</gateways>
+
+	<domains>
+		<!-- indicator to parse the directory for domains with parse="true" to get gateways-->
+		<!--<domain name="$${domain}" parse="true"/>-->
+		<!-- indicator to parse the directory for domains with parse="true" to get gateways and alias every domain to this profile -->
+		<!--<domain name="all" alias="true" parse="true"/>-->
+		<domain name="all" alias="true" parse="false"/>
+	</domains>
+
+	<settings>
+		<param name="user-agent-string" value="FreeSWITCH"/>
+		<param name="debug" value="0"/>
+		<param name="sip-trace" value="no"/>
+		<param name="sip-capture" value="no"/>
+		<param name="watchdog-enabled" value="no"/>
+		<param name="watchdog-step-timeout" value="30000"/>
+		<param name="watchdog-event-timeout" value="30000"/>
+		<param name="log-auth-failures" value="false"/>
+		<param name="forward-unsolicited-mwi-notify" value="false"/>
+		<param name="context" value="public"/>
+		<param name="rfc2833-pt" value="101"/>
+		<param name="sip-port" value="5060"/>
+		<param name="dialplan" value="XML"/>
+		<param name="dtmf-duration" value="2000"/>
+		<param name="inbound-codec-prefs" value="$${global_codec_prefs}"/>
+		<param name="outbound-codec-prefs" value="$${global_codec_prefs}"/>
+		<param name="rtp-timer-name" value="soft"/>
+		<param name="rtp-ip" value="$${local_ip_v4}"/>
+		<param name="sip-ip" value="$${local_ip_v4}"/>
+		<param name="hold-music" value="$${hold_music}"/>
+		<param name="apply-nat-acl" value="nat.auto"/>
+		<param name="aggressive-nat-detection" value="true"/>
+		<param name="enable-timer" value="false"/>
+		<param name="apply-inbound-acl" value="providers"/>
+		<param name="local-network-acl" value="localnet.auto"/>
+		<param name="dtmf-type" value="rfc2833"/>
+		<param name="record-path" value="$${recordings_dir}"/>
+		<param name="record-template" value="${domain_name}/archive/${strftime(%Y)}/${strftime(%b)}/${strftime(%d)}/${uuid}.${record_ext}"/>
+		<param name="manage-presence" value="true"/>
+		<param name="presence-probe-on-register" value="true"/>
+		<param name="manage-shared-appearance" value="true"/>
+		<param name="presence-hosts" value="$${domain},$${local_ip_v4}"/>
+		<param name="presence-privacy" value="$${presence_privacy}"/>
+		<param name="inbound-codec-negotiation" value="generous"/>
+		<param name="tls" value="$${internal_ssl_enable}"/>
+		<param name="tls-only" value="false"/>
+		<param name="tls-bind-params" value="transport=tls"/>
+		<param name="tls-sip-port" value="5061"/>
+		<param name="tls-cert-dir" value="$${internal_ssl_dir}"/>
+		<param name="tls-passphrase" value=""/>
+		<param name="tls-verify-date" value="false"/>
+		<param name="tls-verify-policy" value="none"/>
+		<param name="tls-verify-depth" value="2"/>
+		<param name="tls-verify-in-subjects" value=""/>
+		<param name="tls-version" value="$${sip_tls_version}"/>
+		<param name="inbound-late-negotiation" value="true"/>
+		<param name="inbound-zrtp-passthru" value="true"/>
+		<param name="nonce-ttl" value="60"/>
+		<param name="auth-calls" value="true"/>
+		<param name="auth-subscriptions" value="true"/>
+		<param name="inbound-reg-force-matching-username" value="true"/>
+		<param name="auth-all-packets" value="false"/>
+		<param name="ext-rtp-ip" value="$${external_rtp_ip}"/>
+		<param name="ext-sip-ip" value="$${external_sip_ip}"/>
+		<param name="media_timeout" value="300"/>
+		<param name="media_hold_timeout" value="1800"/>
+		<param name="ws-binding" value=":5066"/>
+		<param name="wss-binding" value=":7443"/>
+		<param name="NDLB-force-rport" value="safe"/>
+		<param name="challenge-realm" value="auto_to"/>
+		<param name="track-calls" value="false"/>
+
+	</settings>
+</profile>

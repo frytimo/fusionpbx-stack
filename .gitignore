@@ -1,0 +1,14 @@
+!.keep
+!.gitkeep
+.env
+freeswitch/build/freeswitch/
+freeswitch/build/sofia-sip/
+freeswitch/build/spandsp/
+nbproject/
+freeswitch/build/sounds/
+freeswitch/sounds/
+freeswitch/db/*
+fusionpbx/cache/*
+!fusionpbx/etc/config.conf.example
+fusionpbx/etc/*
+postgres/db/pgdata/

@@ -1,0 +1,11 @@
+<include>
+  <user id="default"> <!--if id is numeric mailbox param is not necessary-->
+    <variables>
+      <!--all variables here will be set on all inbound calls that originate from this user -->
+      <!-- set these to take advantage of a dialplan localized to this user -->
+      <variable name="numbering_plan" value=""/>
+      <variable name="default_gateway" value=""/>
+      <variable name="default_area_code" value=""/>
+    </variables>
+  </user>
+</include>

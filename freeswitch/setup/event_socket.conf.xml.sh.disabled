@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source /docker-entrypoint.d/globals.sh
+
+FILE="/etc/freeswitch/autoload_configs/event_socket.conf.xml"
+
+#
+# add container ip for event_socket to listen to
+#
+sed -i -E "s#(<param name=\"listen-ip\" value=\")(.*)(\"/>)#\1${SWITCH_IP}\3#g" ${FILE}

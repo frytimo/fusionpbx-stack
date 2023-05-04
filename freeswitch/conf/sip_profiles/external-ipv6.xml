@@ -1,0 +1,62 @@
+<profile name="external-ipv6">
+	<!-- http://wiki.freeswitch.org/wiki/Sofia_Configuration_Files -->
+	<!--aliases are other names that will work as a valid profile name for this profile-->
+	<aliases>
+	</aliases>
+
+	<!-- Outbound Registrations -->
+	<gateways>
+		<X-PRE-PROCESS cmd="include" data="external-ipv6/*.xml"/>
+	</gateways>
+
+	<domains>
+	</domains>
+
+	<settings>
+		<param name="debug" value="0"/>
+		<param name="user-agent-string" value="FreeSWITCH"/>
+		<param name="sip-trace" value="no"/>
+		<param name="sip-capture" value="no"/>
+		<param name="rfc2833-pt" value="101"/>
+		<param name="sip-port" value="$${external_sip_port}"/>
+		<param name="dialplan" value="XML"/>
+		<param name="context" value="public"/>
+		<param name="dtmf-duration" value="2000"/>
+		<param name="inbound-codec-prefs" value="$${global_codec_prefs}"/>
+		<param name="outbound-codec-prefs" value="$${outbound_codec_prefs}"/>
+		<param name="hold-music" value="$${hold_music}"/>
+		<param name="rtp-timer-name" value="soft"/>
+		<param name="local-network-acl" value="localnet.auto"/>
+		<param name="manage-presence" value="false"/>
+		<param name="inbound-codec-negotiation" value="generous"/>
+		<param name="nonce-ttl" value="60"/>
+		<param name="auth-calls" value="true"/>
+		<param name="auth-all-packets" value="false"/>
+		<param name="apply-inbound-acl" value="providers"/>
+		<param name="dtmf-type" value="rfc2833"/>
+		<param name="auth-subscriptions" value="true"/>
+		<param name="inbound-late-negotiation" value="true"/>
+		<param name="inbound-zrtp-passthru" value="true"/>
+		<param name="rtp-ip" value="$${local_ip_v6}"/>
+		<param name="sip-ip" value="$${local_ip_v6}"/>
+		<param name="media_timeout" value="300"/>
+		<param name="media_hold_timeout" value="1800"/>
+		<param name="tls" value="$${external_ssl_enable}"/>
+		<param name="tls-only" value="false"/>
+		<param name="tls-bind-params" value="transport=tls"/>
+		<param name="tls-sip-port" value="$${external_tls_port}"/>
+		<param name="tls-cert-dir" value="$${external_ssl_dir}"/>
+		<param name="tls-passphrase" value=""/>
+		<param name="tls-verify-date" value="false"/>
+		<param name="tls-verify-policy" value="none"/>
+		<param name="tls-verify-depth" value="2"/>
+		<param name="tls-verify-in-subjects" value=""/>
+		<param name="tls-version" value="$${sip_tls_version}"/>
+		<param name="zrtp-passthru" value="true"/>
+		<param name="auth-all-packets" value="false"/>
+		<param name="session-timeout" value="0"/>
+		<param name="enable-timer" value="false"/>
+		<param name="track-calls" value="false"/>
+
+	</settings>
+</profile>
