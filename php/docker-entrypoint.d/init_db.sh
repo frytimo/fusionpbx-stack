@@ -1,6 +1,8 @@
 #!/bin/bash
+
+/usr/local/src/upgrade_apps/init_database.php
 if [ ! -f /var/www/fusionpbx/core/upgrade/init_database.php ]; then
-    ln -s /usr/local/src/upgrade_apps/init_database.php /var/www/fusionpbx/core/upgrade/init_database.php
+    gosu fusionpbx sh -c "ln -s /usr/local/src/upgrade_apps/init_database.php /var/www/fusionpbx/core/upgrade/init_database.php"
 fi
 
 PHP=$(which php)

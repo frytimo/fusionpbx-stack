@@ -51,14 +51,18 @@
 	}
 
 	function has_table(PDO $con, string $table) {
+		$exists = true;
+		ob_start();
 		try {
 			$sql = "select * from $table";
 			$statement = $con->prepare($sql);
 			$statement->execute();
 		} catch (Exception $e) {
-			return false;
+			$exists = false;
+		} finally {
+			ob_end_clean();
 		}
-		return true;
+		return $exists;
 	}
 
 	function db_execute($con, $sql, ?int $fetch_type = null) {
@@ -96,7 +100,7 @@
 			if(is_array($table_name)) {
 				$table_name = $table['table']['name']['text'];
 			}
-			$sql = "create table $table_name (";
+			$sql = "create table if not exists $table_name (";
 			if(!empty($table['fields'])) {
 				foreach($table['fields'] as $field) {
 					if(isset($field['deprecated']) && $field['deprecated'] == true)
@@ -266,6 +270,43 @@
 
 	if(empty(get_switch_setting($con, 'voicemail')))
 		put_switch_setting($con, 'ba3ac900-245c-4cff-a191-829137db47d8' ,'voicemail', '/var/lib/freeswitch/storage/voicemail');
+
+	// make sure the v_settings table exists
+	if(!has_table($con, 'v_settings')) {
+		write_schema($con, get_schema_from_app_config(APP_DIR . '/settings'));
+	}
+
+	// get the current data
+	$socket_ip = db_execute($con, "select event_socket_ip_address from v_settings", 7);
+
+	if(empty($socket_ip) || $socket_ip === false) {
+		db_execute($con, "insert into v_settings ("
+			. "setting_uuid"
+			. ",event_socket_ip_address"
+			. ",event_socket_port"
+			. ",event_socket_password"
+			. ",event_socket_acl"
+			. ",xml_rpc_http_port"
+			. ",xml_rpc_auth_realm"
+			. ",xml_rpc_auth_user"
+			. ",xml_rpc_auth_pass"
+			. ",mod_shout_volume"
+			. ") values ("
+			. "'ce1b1936-fc61-4e8c-84cf-252a510a74fd'"
+			. ",'fs'"
+			. ",'8021'"
+			. ",'ClueCon'"
+			. ",'any_v4.auto'"
+			. ",'8080'"
+			. ",'freeswitch'"
+			. ",'freeswitch'"
+			. ",'works'"
+			. ",'0.3'"
+			. ")"
+			);
+	} elseif ($socket_ip !== 'fs') {
+		db_execute($con, "update v_settings set event_socket_ip_address = 'fs' where setting_uuid = 'ce1b1936-fc61-4e8c-84cf-252a510a74fd'");
+	}
 
 	//now run the core upgrade twice
 
