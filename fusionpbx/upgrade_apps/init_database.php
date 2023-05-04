@@ -228,8 +228,9 @@
 	
 	if(!has_table($con, 'v_default_settings'))
 		write_schema($con, get_schema_from_app_config(CORE_DIR.'/default_settings'));
-	
-	if(empty(get_switch_setting($con, 'base')))
+
+	$base = get_switch_setting($con, 'base');
+	if(is_null($base) || $base === false)
 		put_switch_setting($con, '09e2eed0-0254-4e57-860c-f281491927c8' ,'base', '');
 
 	if(empty(get_switch_setting($con, 'bin')))
