@@ -9,4 +9,5 @@ freeswitch/build/sounds/
 freeswitch/sounds/
 freeswitch/db/*
 fusionpbx/cache/*
+fusionpbx/etc/config.conf
 postgres/db/pgdata/
