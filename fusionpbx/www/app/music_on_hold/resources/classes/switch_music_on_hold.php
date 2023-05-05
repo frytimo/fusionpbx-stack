@@ -73,7 +73,7 @@ if (!class_exists('switch_music_on_hold')) {
 					foreach($music_list as $row) {
 						if ($previous_name != $row['music_on_hold_name']) {
 							$name = '';
-							if (strlen($row['domain_uuid']) > 0) {
+							if (!empty($row['domain_uuid'])) {
 								$name = $row['domain_name'].'/';	
 							}
 							$name .= $row['music_on_hold_name'];
@@ -286,7 +286,7 @@ if (!class_exists('switch_music_on_hold')) {
 							$array['music_on_hold'][$i]['domain_uuid'] = $domain_uuid;
 							$array['music_on_hold'][$i]['music_on_hold_name'] = $category_name;
 							$array['music_on_hold'][$i]['music_on_hold_path'] = $file_path;
-							$array['music_on_hold'][$i]['music_on_hold_rate'] = strlen($sample_rate) != 0 ? $sample_rate : null;
+							$array['music_on_hold'][$i]['music_on_hold_rate'] = !empty($sample_rate) ? $sample_rate : null;
 							$array['music_on_hold'][$i]['music_on_hold_shuffle'] = 'false';
 							$array['music_on_hold'][$i]['music_on_hold_channels'] = 1;
 							$array['music_on_hold'][$i]['music_on_hold_interval'] = 20;

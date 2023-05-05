@@ -26,7 +26,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -70,7 +70,7 @@
 	}
 
 //process the data
-	if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+	if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 
 		//get the domain_uuid
 			if ($action == "update" && $_POST["domain_uuid"]) {
@@ -102,9 +102,9 @@
 
 		//check for all required data
 			$msg = '';
-			if (strlen($domain_name) == 0) { $msg .= $text['message-required'].$text['label-name']."<br>\n"; }
-			//if (strlen($domain_description) == 0) { $msg .= $text['message-required'].$text['label-description']."<br>\n"; }
-			if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+			if (empty($domain_name)) { $msg .= $text['message-required'].$text['label-name']."<br>\n"; }
+			//if (empty($domain_description)) { $msg .= $text['message-required'].$text['label-description']."<br>\n"; }
+			if (!empty($msg) && empty($_POST["persistformvar"])) {
 				require_once "resources/header.php";
 				require_once "resources/persist_form_var.php";
 				echo "<div align='center'>\n";
@@ -165,14 +165,14 @@
 							}
 
 						//create the recordings directory for the new domain.
-							if (isset($_SESSION['switch']['recordings']['dir']) && strlen($_SESSION['switch']['recordings']['dir']) > 0) {
+							if (isset($_SESSION['switch']['recordings']['dir']) && !empty($_SESSION['switch']['recordings']['dir'])) {
 								if (!file_exists($_SESSION['switch']['recordings']['dir']."/".$domain_name)) {
 									mkdir($_SESSION['switch']['recordings']['dir']."/".$domain_name, 0770);
 								}
 							}
 
 						//create the voicemail directory for the new domain.
-							if (isset($_SESSION['switch']['voicemail']['dir']) && strlen($_SESSION['switch']['voicemail']['dir']) > 0) {
+							if (isset($_SESSION['switch']['voicemail']['dir']) && !empty($_SESSION['switch']['voicemail']['dir'])) {
 								if (!file_exists($_SESSION['switch']['voicemail']['dir']."/default/".$domain_name)) {
 									mkdir($_SESSION['switch']['voicemail']['dir']."/default/".$domain_name, 0770);
 								}
@@ -571,7 +571,7 @@
 	}
 
 //set the defaults
-	if (strlen($domain_enabled) == 0) { $domain_enabled = 'true'; }
+	if (empty($domain_enabled)) { $domain_enabled = 'true'; }
 
 //create token
 	$object = new token;

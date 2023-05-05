@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -73,7 +73,7 @@
 
 //copy the csv file
 	//$_POST['submit'] == "Upload" &&
-	if (is_uploaded_file($_FILES['ulfile']['tmp_name']) && permission_exists('user_import')) {
+	if (is_uploaded_file($_FILES['ulfile']['tmp_name'] ?? '') && permission_exists('user_import')) {
 		if ($_POST['type'] == 'csv') {
 			$file = $_SESSION['server']['temp']['dir'].'/users-'.$_SESSION['domain_name'].'.csv';
 			if (move_uploaded_file($_FILES['ulfile']['tmp_name'], $file)) {
@@ -83,7 +83,7 @@
 	}
 
 //get the schema
-	if (strlen($delimiter) > 0 && file_exists($_SESSION['file'])) {
+	if (!empty($delimiter) && file_exists($_SESSION['file'])) {
 		//get the first line
 			$line = fgets(fopen($_SESSION['file'], 'r'));
 			$line_fields = explode($delimiter, $line);
@@ -137,7 +137,7 @@
 	}
 
 //match the column names to the field names
-	if (strlen($delimiter) > 0 && file_exists($_SESSION['file']) && $action != 'import') {
+	if (!empty($delimiter) && file_exists($_SESSION['file']) && $action != 'import') {
 
 		//create token
 			$object = new token;
@@ -233,11 +233,11 @@
 	}
 
 //upload the csv
-	if (file_exists($_SESSION['file']) && $action == 'import') {
+	if (file_exists($_SESSION['file'] ?? '') && $action == 'import') {
 
 		//validate the token
 			$token = new token;
-			if (!$token->validate($_SERVER['PHP_SELF'])) {
+			if (!$token->validate($_SERVER['PHP_SELF'] ?? '')) {
 				message::add($text['message-invalid_token'],'negative');
 				header('Location: users.php');
 				exit;
@@ -297,8 +297,8 @@
 									//}
 
 									//build the data array
-									if (strlen($table_name) > 0) {
-										if (strlen($parent) == 0) {
+									if (!empty($table_name)) {
+										if (empty($parent)) {
 											$array[$table_name][$row_id]['domain_uuid'] = $domain_uuid;
 											$array[$table_name][$row_id][$field_name] = $result[$key];
 										}

@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -102,7 +102,7 @@
 
 //get the count
 	$sql = "select count(default_setting_uuid) from v_default_settings ";
-	if (isset($search) && strlen($search) > 0) {
+	if (isset($search) && !empty($search)) {
 		$sql .= "where (";
 		$sql .= "	lower(default_setting_category) like :search ";
 		$sql .= "	or lower(default_setting_subcategory) like :search ";
@@ -112,7 +112,7 @@
 		$sql .= ") ";
 		$parameters['search'] = '%'.$search.'%';
 	}
-	if (isset($default_setting_category) && strlen($default_setting_category) > 0) {
+	if (isset($default_setting_category) && !empty($default_setting_category)) {
 		$sql .= (stripos($sql,'WHERE') === false) ? 'where ' : 'and ';
 		$sql .= "lower(default_setting_category) = :default_setting_category ";
 		$parameters['default_setting_category'] = strtolower($default_setting_category);
@@ -124,7 +124,7 @@
 	$sql = "select default_setting_uuid, default_setting_category, default_setting_subcategory, default_setting_name, ";
 	$sql .= "default_setting_value, cast(default_setting_enabled as text), default_setting_description ";
 	$sql .= "from v_default_settings ";
-	if (isset($search) && strlen($search) > 0) {
+	if (isset($search) && !empty($search)) {
 		$sql .= "where (";
 		$sql .= "	lower(default_setting_category) like :search ";
 		$sql .= "	or lower(default_setting_subcategory) like :search ";
@@ -134,7 +134,7 @@
 		$sql .= ") ";
 		$parameters['search'] = '%'.$search.'%';
 	}
-	if (isset($default_setting_category) && strlen($default_setting_category) > 0) {
+	if (isset($default_setting_category) && !empty($default_setting_category)) {
 		$sql .= (stripos($sql,'WHERE') === false) ? 'where ' : 'and ';
 		$sql .= "lower(default_setting_category) = :default_setting_category ";
 		$parameters['default_setting_category'] = strtolower($default_setting_category);
@@ -153,7 +153,7 @@
 	$sql .= "	count(d2.default_setting_category) ";
 	$sql .= "	from v_default_settings as d2 ";
 	$sql .= "	where d2.default_setting_category = d1.default_setting_category ";
-	if (isset($search) && strlen($search) > 0) {
+	if (isset($search) && !empty($search)) {
 		$sql .= "	and (";
 		$sql .= "		lower(d2.default_setting_category) like :search ";
 		$sql .= "		or lower(d2.default_setting_subcategory) like :search ";
@@ -345,7 +345,7 @@
 				if ($row['default_setting_value'] !== $field['default_setting_value']) {
 					$setting_bold = 'font-weight:bold;';
 				}
-				if (strlen($field['default_setting_value']) > 0) {
+				if (!empty($field['default_setting_value'])) {
 					$default_value = 'Default: '.$field['default_setting_value'];
 				}
 				else {

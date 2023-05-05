@@ -1,2 +1,4 @@
-#!/bin/bash
-docker build -t fpbx-nginx:1.23.2-alpine --build-arg NGINX_VERSION=1.23.2-alpine .
+#!/usr/bin/env sh
+set -a
+. ../.env
+docker build -t fpbx-nginx:${NGINX_VERSION} --build-arg NGINX_VERSION=${NGINX_VERSION} .

@@ -25,7 +25,9 @@
 */
 
 //add the document root to the include path
-	$config_glob = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf");
+	$conf_bsd = glob("/usr/localetc/fusionpbx/config.conf");
+	$config_glob = array_merge($conf_linux, $conf_bsd);
 	$conf = parse_ini_file($config_glob[0]);
 	set_include_path($conf['document.root']);
 

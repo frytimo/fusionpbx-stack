@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env sh
+
 
 #
 # get the ip of this container

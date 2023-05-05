@@ -4,6 +4,9 @@ FROM php:${PHP_VERSION}
 # install the php-extensions script to simplify dockerfile
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
+# These are some packages that contain commands FusionPBX runs in a shell
+RUN apk add procps uptimed lsb-release
+
 ARG XDEBUG_VERSION=3.2.1
 # Install Postgres extension
 RUN chmod +x /usr/local/bin/install-php-extensions && \
@@ -31,14 +34,15 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
  zip
 
 # Install Supervisor
-RUN apt-get update && apt-get -y install supervisor && mkdir /etc/supervisor.d
+RUN apk add supervisor && mkdir /etc/supervisor.d
 
 # Create user and group
-RUN addgroup -q --gid 1000 fusionpbx && adduser --shell /bin/bash -q --no-create-home --uid 1000 --gid 1000 fusionpbx
+RUN addgroup -S -g 1000 fusionpbx && adduser -S -D -u 1000 -G fusionpbx fusionpbx
 
 # Create workdir
 RUN mkdir /etc/fusionpbx && chown fusionpbx:fusionpbx /etc/fusionpbx && mkdir -p /var/www/fusionpbx && touch /var/www/fusionpbx/docker-volume-not-mounted && chown fusionpbx:fusionpbx /var/www/fusionpbx
-WORKDIR /var/www/fusionpbx
+
+WORKDIR /
 
 COPY ./docker-entrypoint.sh /
 

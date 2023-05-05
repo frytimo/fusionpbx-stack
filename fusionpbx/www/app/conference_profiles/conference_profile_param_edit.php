@@ -1,7 +1,7 @@
 <?php
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -44,7 +44,7 @@
 	}
 
 //process the http post if it exists
-	if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+	if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 	
 		//get the uuid
 			if ($action == "update") {
@@ -61,10 +61,10 @@
 
 		//check for all required data
 			$msg = '';
-			if (strlen($profile_param_name) == 0) { $msg .= $text['message-required']." ".$text['label-profile_param_name']."<br>\n"; }
-			if (strlen($profile_param_value) == 0) { $msg .= $text['message-required']." ".$text['label-profile_param_value']."<br>\n"; }
-			if (strlen($profile_param_enabled) == 0) { $msg .= $text['message-required']." ".$text['label-profile_param_enabled']."<br>\n"; }
-			if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+			if (empty($profile_param_name)) { $msg .= $text['message-required']." ".$text['label-profile_param_name']."<br>\n"; }
+			if (empty($profile_param_value)) { $msg .= $text['message-required']." ".$text['label-profile_param_value']."<br>\n"; }
+			if (empty($profile_param_enabled)) { $msg .= $text['message-required']." ".$text['label-profile_param_enabled']."<br>\n"; }
+			if (!empty($msg) && empty($_POST["persistformvar"])) {
 				$document['title'] = $text['title-conference_profile_param'];
 				require_once "resources/header.php";
 				require_once "resources/persist_form_var.php";
@@ -129,7 +129,7 @@
 	}
 
 //set the defaults
-	if (strlen($profile_param_enabled) == 0) { $profile_param_enabled = 'true'; }
+	if (empty($profile_param_enabled)) { $profile_param_enabled = 'true'; }
 
 //create token
 	$object = new token;

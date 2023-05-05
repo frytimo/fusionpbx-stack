@@ -22,7 +22,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -61,7 +61,7 @@
 	}
 
 //process the user data and save it to the database
-	if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+	if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 
 		//validate the token
 			$token = new token;
@@ -72,7 +72,7 @@
 			}
 
 		//process the http post data by submitted action
-			if ($_POST['action'] != '' && strlen($_POST['action']) > 0) {
+			if ($_POST['action'] != '' && !empty($_POST['action'])) {
 
 				//prepare the array(s)
 				$x = 0;
@@ -115,11 +115,11 @@
 
 		//check for all required data
 			$msg = '';
-			if (strlen($number_translation_name) == 0) { $msg .= $text['message-required']." ".$text['label-number_translation_name']."<br>\n"; }
-			//if (strlen($number_translation_details) == 0) { $msg .= $text['message-required']." ".$text['label-number_translation_details']."<br>\n"; }
-			if (strlen($number_translation_enabled) == 0) { $msg .= $text['message-required']." ".$text['label-number_translation_enabled']."<br>\n"; }
-			//if (strlen($number_translation_description) == 0) { $msg .= $text['message-required']." ".$text['label-number_translation_description']."<br>\n"; }
-			if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+			if (empty($number_translation_name)) { $msg .= $text['message-required']." ".$text['label-number_translation_name']."<br>\n"; }
+			//if (empty($number_translation_details)) { $msg .= $text['message-required']." ".$text['label-number_translation_details']."<br>\n"; }
+			if (empty($number_translation_enabled)) { $msg .= $text['message-required']." ".$text['label-number_translation_enabled']."<br>\n"; }
+			//if (empty($number_translation_description)) { $msg .= $text['message-required']." ".$text['label-number_translation_description']."<br>\n"; }
+			if (!empty($msg) && empty($_POST["persistformvar"])) {
 				require_once "resources/header.php";
 				require_once "resources/persist_form_var.php";
 				echo "<div align='center'>\n";
@@ -145,7 +145,7 @@
 			$y = 0;
 			if (is_array($number_translation_details)) {
 				foreach ($number_translation_details as $row) {
-					if (strlen($row['number_translation_detail_regex']) > 0) {
+					if (!empty($row['number_translation_detail_regex'])) {
 						$array['number_translations'][0]['number_translation_details'][$y]['number_translation_detail_uuid'] = $row["number_translation_detail_uuid"];
 						$array['number_translations'][0]['number_translation_details'][$y]['number_translation_detail_regex'] = $row["number_translation_detail_regex"];
 						$array['number_translations'][0]['number_translation_details'][$y]['number_translation_detail_replace'] = $row["number_translation_detail_replace"];

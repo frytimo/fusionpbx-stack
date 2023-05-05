@@ -25,7 +25,9 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf");
+	$conf_bsd = glob("/usr/localetc/fusionpbx/config.conf");
+	$conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -48,9 +50,9 @@
 	//}
 
 //set a default template
-	if (strlen($_SESSION["template_full_path"]) == 0) { //build template if session template has no length
+	if (empty($_SESSION["template_full_path"])) { //build template if session template has no length
 		$template_base_path = $_SERVER["DOCUMENT_ROOT"].PROJECT_PATH.'/themes';
-		if (strlen($template_rss_sub_category) > 0) {
+		if (!empty($template_rss_sub_category)) {
 			//this template was assigned by the content manager
 				//get the contents of the template and save it to the template variable
 				$template_full_path = $template_base_path.'/'.$template_rss_sub_category.'/template.php';

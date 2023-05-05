@@ -31,7 +31,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -177,7 +177,7 @@
 			}
 			else {
 				//local extension (source) > external number (destination)
-				if (user_exists($src) && strlen($dest_cid_number) == 0) {
+				if (user_exists($src) && empty($dest_cid_number)) {
 					//retrieve outbound caller id from the (source) extension
 					$sql = "select outbound_caller_id_name, outbound_caller_id_number from v_extensions where domain_uuid = :domain_uuid and extension = :src ";
 					$parameters['domain_uuid'] = $_SESSION['domain_uuid'];

@@ -22,7 +22,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -118,7 +118,7 @@
 	$param = "&search=".$search;
 	$param = ($_GET['show'] == 'all' && permission_exists('stream_all')) ? "&show=all" : null;
 	$page = is_numeric($_GET['page']) ? $_GET['page'] : 0;
-	if (strlen($page) == 0) { $page = 0; $_GET['page'] = 0; }
+	if (empty($page)) { $page = 0; $_GET['page'] = 0; }
 	list($paging_controls, $rows_per_page) = paging($num_rows, $param, $rows_per_page);
 	list($paging_controls_mini, $rows_per_page) = paging($num_rows, $param, $rows_per_page, true);
 	$offset = $rows_per_page * $page;
@@ -274,7 +274,7 @@
 			}
 			echo "	</td>\n";
 			echo "	<td class='no-wrap button'>\n";
-			if (strlen($row['stream_location']) > 0) {
+			if (!empty($row['stream_location'])) {
 				$location_parts = explode('://',$row['stream_location']);
 				$http_protocol = ($location_parts[0] == "shout") ? 'http' : 'https';
 				echo "<audio src='".$http_protocol."://".$location_parts[1]."' controls='controls' />\n";

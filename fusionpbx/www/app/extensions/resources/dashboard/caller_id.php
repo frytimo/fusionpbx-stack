@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -269,7 +269,7 @@
 							echo "<select class='formfld' name='extensions[".$x."][outbound_caller_id]' id='outbound_caller_id_number_".$x."' style='width: 100%; min-width: 150px;'>\n";
 							echo "	<option value=''></option>\n";
 							foreach ($destinations as &$field) {
-								if (strlen($field['destination_caller_id_number']) > 0) {
+								if (!empty($field['destination_caller_id_number'])) {
 									echo "<option value='".escape($field['destination_caller_id_name'])."@".escape($field['destination_caller_id_number'])."' ".($row['outbound_caller_id_number'] == $field['destination_caller_id_number'] ? "selected='selected'" : null).">".escape($field['destination_caller_id_name'])." ".escape($field['destination_caller_id_number'])."</option>\n";
 								}
 							}

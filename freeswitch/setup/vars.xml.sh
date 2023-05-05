@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
-source /docker-entrypoint.d/globals.sh
+. /docker-entrypoint.d/globals.sh
 
 FILE="/etc/freeswitch/vars.xml"
 

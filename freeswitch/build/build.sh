@@ -1,2 +1,5 @@
-#!/bin/bash
-docker build -t fpbx-fs:1.10.9 --build-arg DEBIAN_VERSION=11 --build-arg FREESWITCH_VERSION=1.10.9 .
+#!/usr/bin/env sh
+set -a
+. ../../.env
+
+docker build -t fpbx-fs:${FREESWITCH_VERSION} --build-arg DEBIAN_VERSION=${DEBIAN_VERSION} --build-arg FREESWITCH_VERSION=${FREESWITCH_VERSION} .

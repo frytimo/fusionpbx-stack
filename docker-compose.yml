@@ -71,7 +71,8 @@ services:
     volumes:
       - ./fusionpbx/www:/var/www/fusionpbx
       - ./fusionpbx/etc/:/etc/fusionpbx
-      - ./fusionpbx/upgrade_apps:/usr/local/src/upgrade_apps
+      - ./fusionpbx/upgrade_apps/init_database.php:/var/www/fusionpbx/core/upgrade/init_database.php
+      - ./fusionpbx/upgrade_apps/upgrade_menu.php:/var/www/fusionpbx/core/upgrade/upgrade_menu.php
       - ./fusionpbx/extra_apps:/usr/local/src/extra_apps
       - ./php/docker-entrypoint.d:/docker-entrypoint.d:ro
       - ./php/socket:/var/run/php

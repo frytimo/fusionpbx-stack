@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -93,10 +93,10 @@
 			unset($sql, $parameters, $row);
 
 		//set defaults
-			if (strlen($expire_seconds) == 0) {
+			if (empty($expire_seconds)) {
 				$expire_seconds = '800';
 			}
-			if (strlen($retry_seconds) == 0) {
+			if (empty($retry_seconds)) {
 				$retry_seconds = '30';
 			}
 

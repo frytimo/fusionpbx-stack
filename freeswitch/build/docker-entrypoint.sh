@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 set -e
 
 chown -R fusionpbx:fusionpbx /var/log/freeswitch
@@ -28,7 +28,7 @@ if [ "x$1" = 'xsupervisord' ]; then
     # execute freeswitch with fusionpbx user and group permissions
     #
     #exec gosu fusionpbx /usr/bin/freeswitch -rp -u fusionpbx -g fusionpbx -nonat -nc
-    /usr/bin/supervisord --nodaemon --configuration /etc/supervisord.conf
+    exec "$@"
 fi
 
 if [ "x$1" = "x" ]; then

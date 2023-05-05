@@ -22,7 +22,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -71,7 +71,7 @@
 	}
 
 //process the user data and save it to the database
-	if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+	if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 
 		//validate the token
 			$token = new token;
@@ -82,7 +82,7 @@
 			}
 
 		//process the http post data by submitted action
-			if ($_POST['action'] != '' && strlen($_POST['action']) > 0) {
+			if ($_POST['action'] != '' && !empty($_POST['action'])) {
 
 				//prepare the array(s)
 				//send the array to the database class
@@ -116,13 +116,13 @@
 
 		//check for all required data
 			$msg = '';
-			//if (strlen($domain_uuid) == 0) { $msg .= $text['message-required']." ".$text['label-domain_uuid']."<br>\n"; }
-			if (strlen($extension_setting_type) == 0) { $msg .= $text['message-required']." ".$text['label-extension_setting_type']."<br>\n"; }
-			if (strlen($extension_setting_name) == 0) { $msg .= $text['message-required']." ".$text['label-extension_setting_name']."<br>\n"; }
-			//if (strlen($extension_setting_value) == 0) { $msg .= $text['message-required']." ".$text['label-extension_setting_value']."<br>\n"; }
-			if (strlen($extension_setting_enabled) == 0) { $msg .= $text['message-required']." ".$text['label-extension_setting_enabled']."<br>\n"; }
-			//if (strlen($extension_setting_description) == 0) { $msg .= $text['message-required']." ".$text['label-extension_setting_description']."<br>\n"; }
-			if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+			//if (empty($domain_uuid)) { $msg .= $text['message-required']." ".$text['label-domain_uuid']."<br>\n"; }
+			if (empty($extension_setting_type)) { $msg .= $text['message-required']." ".$text['label-extension_setting_type']."<br>\n"; }
+			if (empty($extension_setting_name)) { $msg .= $text['message-required']." ".$text['label-extension_setting_name']."<br>\n"; }
+			//if (empty($extension_setting_value)) { $msg .= $text['message-required']." ".$text['label-extension_setting_value']."<br>\n"; }
+			if (empty($extension_setting_enabled)) { $msg .= $text['message-required']." ".$text['label-extension_setting_enabled']."<br>\n"; }
+			//if (empty($extension_setting_description)) { $msg .= $text['message-required']." ".$text['label-extension_setting_description']."<br>\n"; }
+			if (!empty($msg) && empty($_POST["persistformvar"])) {
 				require_once "resources/header.php";
 				require_once "resources/persist_form_var.php";
 				echo "<div align='center'>\n";
@@ -214,7 +214,7 @@
 	}
 
 //set the defaults
-	if (strlen($extension_setting_enabled) == 0) { $extension_setting_enabled = 'true'; }
+	if (empty($extension_setting_enabled)) { $extension_setting_enabled = 'true'; }
 
 //create token
 	$object = new token;
@@ -265,7 +265,7 @@
 	//echo "</td>\n";
 	//echo "<td class='vtable' style='position: relative;' align='left'>\n";
 	//echo "	<select class='formfld' name='domain_uuid'>\n";
-	//if (strlen($domain_uuid) == 0) {
+	//if (empty($domain_uuid)) {
 	//	echo "		<option value='' selected='selected'>".$text['select-global']."</option>\n";
 	//}
 	//else {

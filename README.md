@@ -11,6 +11,13 @@ git clone https://github.com/frytimo/fusionpbx-stack.git
 cp fusionpbx-stack/.env.example fusionpbx-stack/.env
 ```
 
+<p>then create a config.conf file or copy the example</p>
+
+```
+cp fusionpbx-stack/fusionpbx/etc/config.conf.example fusionpbx-stack/fusionpbx/etc/config.conf
+```
+
+
 <p>Clone the repos for freeswitch, spandsp, sofia-sip using:</p>
 
 ```
@@ -18,4 +25,9 @@ cd fusionpbx-stack/freeswitch/build && git clone https://github.com/signalwire/f
 ```
 
 <p>Now execute the stack</p>
-<p>docker-compose up</p>
+
+```
+docker-compose up
+```
+
+

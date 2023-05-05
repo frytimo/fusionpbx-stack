@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -87,7 +87,7 @@
 	}
 
 //process the user data and save it to the database
-	if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+	if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 
 		//get the uuid from the POST
 			if ($action == "update") {
@@ -104,12 +104,12 @@
 
 		//check for all required data
 			$msg = '';
-			//if (strlen($sip_profile_uuid) == 0) { $msg .= $text['message-required']." ".$text['label-sip_profile_uuid']."<br>\n"; }
-			if (strlen($sip_profile_name) == 0) { $msg .= $text['message-required']." ".$text['label-sip_profile_name']."<br>\n"; }
-			//if (strlen($sip_profile_hostname) == 0) { $msg .= $text['message-required']." ".$text['label-sip_profile_hostname']."<br>\n"; }
-			if (strlen($sip_profile_enabled) == 0) { $msg .= $text['message-required']." ".$text['label-sip_profile_enabled']."<br>\n"; }
-			if (strlen($sip_profile_description) == 0) { $msg .= $text['message-required']." ".$text['label-sip_profile_description']."<br>\n"; }
-			if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+			//if (empty($sip_profile_uuid)) { $msg .= $text['message-required']." ".$text['label-sip_profile_uuid']."<br>\n"; }
+			if (empty($sip_profile_name)) { $msg .= $text['message-required']." ".$text['label-sip_profile_name']."<br>\n"; }
+			//if (empty($sip_profile_hostname)) { $msg .= $text['message-required']." ".$text['label-sip_profile_hostname']."<br>\n"; }
+			if (empty($sip_profile_enabled)) { $msg .= $text['message-required']." ".$text['label-sip_profile_enabled']."<br>\n"; }
+			if (empty($sip_profile_description)) { $msg .= $text['message-required']." ".$text['label-sip_profile_description']."<br>\n"; }
+			if (!empty($msg) && empty($_POST["persistformvar"])) {
 				require_once "resources/header.php";
 				require_once "resources/persist_form_var.php";
 				echo "<div align='center'>\n";
@@ -158,14 +158,14 @@
 			$array['sip_profiles'][0]['sip_profile_description'] = $sip_profile_description;
 			$y = 0;
 			foreach ($sip_profile_domains as $row) {
-				if (strlen($row['sip_profile_domain_uuid']) > 0) {
+				if (!empty($row['sip_profile_domain_uuid'])) {
 					if (is_uuid($row['sip_profile_domain_uuid'])) {
 						$sip_profile_domain_uuid = $row['sip_profile_domain_uuid'];
 					}
 					else {
 						$sip_profile_domain_uuid = uuid();
 					}
-					if (strlen($row["sip_profile_domain_alias"]) > 0) {
+					if (!empty($row["sip_profile_domain_alias"])) {
 						$array['sip_profiles'][0]['sip_profile_domains'][$y]["sip_profile_uuid"] = $sip_profile_uuid;
 						$array['sip_profiles'][0]['sip_profile_domains'][$y]["sip_profile_domain_uuid"] = $sip_profile_domain_uuid;
 						$array['sip_profiles'][0]['sip_profile_domains'][$y]["sip_profile_domain_name"] = $row["sip_profile_domain_name"];
@@ -177,14 +177,14 @@
 			}
 			$y = 0;
 			foreach ($sip_profile_settings as $row) {
-				if (strlen($row['sip_profile_setting_uuid']) > 0) {
+				if (!empty($row['sip_profile_setting_uuid'])) {
 					if (is_uuid($row['sip_profile_setting_uuid'])) {
 						$sip_profile_setting_uuid = $row['sip_profile_setting_uuid'];
 					}
 					else {
 						$sip_profile_setting_uuid = uuid();
 					}
-					if (strlen($row["sip_profile_setting_name"]) > 0) {
+					if (!empty($row["sip_profile_setting_name"])) {
 						$array['sip_profiles'][0]['sip_profile_settings'][$y]["sip_profile_uuid"] = $sip_profile_uuid;
 						$array['sip_profiles'][0]['sip_profile_settings'][$y]["sip_profile_setting_uuid"] = $sip_profile_setting_uuid;
 						$array['sip_profiles'][0]['sip_profile_settings'][$y]["sip_profile_setting_name"] = $row["sip_profile_setting_name"];
@@ -283,7 +283,7 @@
 	}
 
 //set the defaults
-	if (strlen($sip_profile_enabled) == 0) { $sip_profile_enabled = 'true'; }
+	if (empty($sip_profile_enabled)) { $sip_profile_enabled = 'true'; }
 
 //get the child data
 	$sql = "select * from v_sip_profile_settings ";

@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -167,7 +167,7 @@
 			unset($sql, $parameters, $row);
 
 		//set the new voicemail password
-			if (strlen($voicemail_password) == 0) {
+			if (empty($voicemail_password)) {
 				$voicemail_password = generate_password(9, 1);
 			}
 

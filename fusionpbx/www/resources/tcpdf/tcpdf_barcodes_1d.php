@@ -834,7 +834,7 @@ class TCPDFBarcode {
 			// add checksum
 			$code .= $this->checksum_s25($code);
 		}
-		if((strlen($code) % 2) != 0) {
+		if((!empty($code) % 2)) {
 			// add leading zero if code-length is odd
 			$code = '0'.$code;
 		}
@@ -908,7 +908,7 @@ class TCPDFBarcode {
 			// add checksum
 			$code .= $this->checksum_s25($code);
 		}
-		if((strlen($code) % 2) != 0) {
+		if((!empty($code) % 2)) {
 			// add leading zero if code-length is odd
 			$code = '0'.$code;
 		}

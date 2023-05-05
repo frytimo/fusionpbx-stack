@@ -25,7 +25,9 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf");
+	$conf_bsd = glob("/usr/localetc/fusionpbx/config.conf");
+	$conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -86,7 +88,7 @@
 	}
 
 //get the schema
-	if (strlen($delimiter) > 0) {
+	if (!empty($delimiter)) {
 		//get the first line
 			$line = fgets(fopen($_SESSION['file'], 'r'));
 			$line_fields = explode($delimiter, $line);
@@ -128,7 +130,7 @@
 	}
 
 //match the column names to the field names
-	if (strlen($delimiter) > 0 && file_exists($_SESSION['file']) && $action != 'import') {
+	if (!empty($delimiter) && file_exists($_SESSION['file']) && $action != 'import') {
 
 		//validate the token
 			$token = new token;
@@ -294,7 +296,7 @@
 									}
 
 									//build the data array
-									if (strlen($table_name) > 0) {
+									if (!empty($table_name)) {
 										$array[$table_name][$row_id]['access_control_node_uuid'] = uuid();
 										$array[$table_name][$row_id]['access_control_uuid'] = $_GET['id'];
 										$array[$table_name][$row_id][$field_name] = $result[$key];

@@ -1,7 +1,7 @@
 <?php
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -86,7 +86,7 @@
 	echo "</td>\n";
 	echo "<td class='vtable' style='position: relative;' align='left'>\n";
 	echo "	<select class='formfld' name='domain_uuid'>\n";
-	if (strlen($domain_uuid) == 0) {
+	if (empty($domain_uuid)) {
 		echo "		<option value='' selected='selected'>".$text['select-global']."</option>\n";
 	}
 	else {

@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -60,7 +60,7 @@
 //get the http post values and set them as php variables
 	if (count($_POST) > 0) {
 		foreach ($_POST['agents'] as $row) {
-			if (strlen($row['agent_status']) > 0) {
+			if (!empty($row['agent_status'])) {
 				//agent set status
 					if ($fp) {
 						// update the database

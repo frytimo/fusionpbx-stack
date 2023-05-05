@@ -1,7 +1,7 @@
 <?php
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -44,7 +44,7 @@
 	}
 
 //process the http post
-	if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+	if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 
 		//get the uuid
 			if ($action == "update") {
@@ -61,11 +61,11 @@
 
 		//check for all required data
 			$msg = '';
-			//if (strlen($control_digits) == 0) { $msg .= $text['message-required']." ".$text['label-control_digits']."<br>\n"; }
-			if (strlen($control_action) == 0) { $msg .= $text['message-required']." ".$text['label-control_action']."<br>\n"; }
-			//if (strlen($control_data) == 0) { $msg .= $text['message-required']." ".$text['label-control_data']."<br>\n"; }
-			if (strlen($control_enabled) == 0) { $msg .= $text['message-required']." ".$text['label-control_enabled']."<br>\n"; }
-			if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+			//if (empty($control_digits)) { $msg .= $text['message-required']." ".$text['label-control_digits']."<br>\n"; }
+			if (empty($control_action)) { $msg .= $text['message-required']." ".$text['label-control_action']."<br>\n"; }
+			//if (empty($control_data)) { $msg .= $text['message-required']." ".$text['label-control_data']."<br>\n"; }
+			if (empty($control_enabled)) { $msg .= $text['message-required']." ".$text['label-control_enabled']."<br>\n"; }
+			if (!empty($msg) && empty($_POST["persistformvar"])) {
 				require_once "resources/header.php";
 				require_once "resources/persist_form_var.php";
 				echo "<div align='center'>\n";
@@ -131,7 +131,7 @@
 	}
 
 //set the defaults
-	if (strlen($control_enabled) == 0) { $control_enabled = 'true'; }
+	if (empty($control_enabled)) { $control_enabled = 'true'; }
 
 //create token
 	$object = new token;

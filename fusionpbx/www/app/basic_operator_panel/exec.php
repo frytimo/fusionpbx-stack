@@ -28,7 +28,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -64,7 +64,7 @@ if (count($_GET) > 0) {
 		$fp = event_socket_create($_SESSION['event_socket_ip_address'], $_SESSION['event_socket_port'], $_SESSION['event_socket_password']);
 
 	//allow specific commands
-		if (strlen($switch_cmd) > 0) {
+		if (!empty($switch_cmd)) {
 			$api_cmd = '';
 			$uuid_pattern = '/[^-A-Fa-f0-9]/';
 			$num_pattern = '/[^-A-Za-z0-9()*#]/';

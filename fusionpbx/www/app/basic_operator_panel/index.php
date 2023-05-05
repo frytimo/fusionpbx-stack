@@ -26,7 +26,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -124,7 +124,7 @@
 							//delete extension from the cache
 							$cache = new cache;
 							$cache->delete("directory:".$row['extension']."@".$_SESSION['user']['domain_name']);
-							if(strlen($number_alias) > 0){
+							if(!empty($number_alias)){
 								$cache->delete("directory:".$row['number_alias']."@".$_SESSION['user']['domain_name']);
 							}
 
@@ -143,7 +143,7 @@
 							//delete extension from the cache
 							$cache = new cache;
 							$cache->delete("directory:".$row['extension']."@".$_SESSION['user']['domain_name']);
-							if(strlen($number_alias) > 0){
+							if(!empty($number_alias)){
 								$cache->delete("directory:".$row['number_alias']."@".$_SESSION['user']['domain_name']);
 							}
 
@@ -169,7 +169,7 @@
 				//delete extension from the cache
 					$cache = new cache;
 					$cache->delete("directory:".$extension."@".$this->domain_name);
-					if(strlen($number_alias) > 0){
+					if(!empty($number_alias)){
 						$cache->delete("directory:".$number_alias."@".$this->domain_name);
 					}
 			}

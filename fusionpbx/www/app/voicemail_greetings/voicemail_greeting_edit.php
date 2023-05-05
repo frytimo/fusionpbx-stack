@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -62,7 +62,7 @@
 		$greeting_name = str_replace("'", "", $greeting_name);
 	}
 
-if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 
 	//delete the voicemail greeting
 		if (permission_exists('voicemail_greeting_delete')) {
@@ -90,8 +90,8 @@ if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
 
 	//check for all required data
 		$msg = '';
-		if (strlen($greeting_name) == 0) { $msg .= "".$text['confirm-name']."<br>\n"; }
-		if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+		if (empty($greeting_name)) { $msg .= "".$text['confirm-name']."<br>\n"; }
+		if (!empty($msg) && empty($_POST["persistformvar"])) {
 			require_once "resources/header.php";
 			require_once "resources/persist_form_var.php";
 			echo "<div align='center'>\n";

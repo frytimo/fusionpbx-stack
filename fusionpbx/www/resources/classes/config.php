@@ -64,7 +64,7 @@ class config {
 	 */
 	public function find() {
 		//set the include path
-			$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+			$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 			set_include_path(parse_ini_file($conf[0])['document.root']);
 
 		//includes files
@@ -89,7 +89,7 @@ class config {
 	 */
 	public function exists() {
 		$this->find();
-		if (strlen($this->config_path) > 0) {
+		if (!empty($this->config_path)) {
 			return true;
 		}
 		else {

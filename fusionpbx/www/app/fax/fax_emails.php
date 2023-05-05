@@ -26,7 +26,7 @@
 */
 
 //set the include path
-$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -105,7 +105,7 @@ if (is_array($result) && @sizeof($result) != 0) {
 		load_domain_settings($domain_uuid);
 
 		$fax_cover_font = $_SESSION['fax']['cover_font']['text'];
-		if(strlen($fax_cover_font) == 0){
+		if(empty($fax_cover_font)){
 			$fax_cover_font = $fax_cover_font_default;
 		}
 
@@ -312,7 +312,7 @@ function load_default_settings() {
 			$name = $row['default_setting_name'];
 			$category = $row['default_setting_category'];
 			$subcategory = $row['default_setting_subcategory'];
-			if (strlen($subcategory) == 0) {
+			if (empty($subcategory)) {
 				if ($name == "array") {
 					$settings[$category][] = $row['default_setting_value'];
 				}
@@ -359,7 +359,7 @@ function load_domain_settings($domain_uuid) {
 					$name = $row['domain_setting_name'];
 					$category = $row['domain_setting_category'];
 					$subcategory = $row['domain_setting_subcategory'];
-					if (strlen($subcategory) == 0) {
+					if (empty($subcategory)) {
 						//$$category[$name] = $row['domain_setting_value'];
 						if ($name == "array") {
 							$_SESSION[$category][] = $row['domain_setting_value'];

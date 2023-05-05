@@ -64,7 +64,7 @@
 				$this->toggle_values = ['true','false'];
 
 			//set the domain_uuid if not provided
-				if (strlen($this->domain_uuid) == 0) {
+				if (empty($this->domain_uuid)) {
 					$this->domain_uuid = $_SESSION['domain_uuid'];
 				}
 
@@ -108,7 +108,7 @@
 				}
 				if (isset($_SESSION['user']['voicemail'])) {
 					foreach ($_SESSION['user']['voicemail'] as $row) {
-						if (strlen($row['voicemail_uuid']) > 0) {
+						if (!empty($row['voicemail_uuid'])) {
 							$voicemail_uuids[]['voicemail_uuid'] = $row['voicemail_uuid'];
 						}
 					}
@@ -221,7 +221,7 @@
 					$sql .= "and v.voicemail_id = :voicemail_id ";
 					$parameters['voicemail_id'] = $this->voicemail_id;
 				}
-				if (strlen($this->order_by) == 0) {
+				if (empty($this->order_by)) {
 					$sql .= "order by v.voicemail_id, m.created_epoch desc ";
 				}
 				else {
@@ -947,7 +947,7 @@ Array
 )
 
 foreach ($_SESSION['user']['extension'] as $value) {
-	if (strlen($value['user']) > 0) {
+	if (!empty($value['user'])) {
 
 	}
 }

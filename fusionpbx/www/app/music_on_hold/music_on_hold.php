@@ -26,7 +26,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -257,7 +257,7 @@
 						$array['music_on_hold'][0]['domain_uuid'] = $domain_uuid;
 						$array['music_on_hold'][0]['music_on_hold_name'] = $stream_name;
 						$array['music_on_hold'][0]['music_on_hold_path'] = $stream_path;
-						$array['music_on_hold'][0]['music_on_hold_rate'] = strlen($stream_rate) != 0 ? $stream_rate : null;
+						$array['music_on_hold'][0]['music_on_hold_rate'] = !empty($stream_rate) ? $stream_rate : null;
 						$array['music_on_hold'][0]['music_on_hold_shuffle'] = 'false';
 						$array['music_on_hold'][0]['music_on_hold_channels'] = 1;
 						$array['music_on_hold'][0]['music_on_hold_interval'] = 20;
@@ -379,9 +379,9 @@
 				echo "	<optgroup label='".$text['option-global']."'>\n";
 				if (is_array($streams) && @sizeof($streams) != 0) {
 					foreach ($streams as $row) {
-						if (strlen($row['domain_uuid']) == 0) {
-							if (strlen($row['music_on_hold_rate']) == 0) { $option_name = $row['music_on_hold_name']; }
-							if (strlen($row['music_on_hold_rate']) > 0) { $option_name = $row['music_on_hold_name'] .'/'.$row['music_on_hold_rate']; }
+						if (empty($row['domain_uuid'])) {
+							if (empty($row['music_on_hold_rate'])) { $option_name = $row['music_on_hold_name']; }
+							if (!empty($row['music_on_hold_rate'])) { $option_name = $row['music_on_hold_name'] .'/'.$row['music_on_hold_rate']; }
 							echo "	<option value='".escape($row['music_on_hold_uuid'])."'>".escape($option_name)."</option>\n";
 						}
 					}
@@ -403,9 +403,9 @@
 				}
 				if (is_array($streams) && @sizeof($streams) != 0) {
 					foreach ($streams as $row) {
-						if (strlen($row['domain_uuid']) > 0) {
-							if (strlen($row['music_on_hold_rate']) == 0) { $option_name = $row['music_on_hold_name']; }
-							if (strlen($row['music_on_hold_rate']) > 0) { $option_name = $row['music_on_hold_name'] .'/'.$row['music_on_hold_rate']; }
+						if (!empty($row['domain_uuid'])) {
+							if (empty($row['music_on_hold_rate'])) { $option_name = $row['music_on_hold_name']; }
+							if (!empty($row['music_on_hold_rate'])) { $option_name = $row['music_on_hold_name'] .'/'.$row['music_on_hold_rate']; }
 							echo "	<option value='".escape($row['music_on_hold_uuid'])."'>".escape($option_name)."</option>\n";
 						}
 					}
@@ -478,7 +478,7 @@
 					}
 
 				//determine if rate was set to auto or not
-					$auto_rate = strlen($music_on_hold_rate) == 0 ? true : false;
+					$auto_rate = empty($music_on_hold_rate) ? true : false;
 
 				//determine icons to show
 					$stream_icons = array();
@@ -569,7 +569,7 @@
 								echo "	</td>\n";
 							}
 							if ($_GET['show'] == "all" && permission_exists('music_on_hold_all')) {
-								if (strlen($_SESSION['domains'][$row['domain_uuid']]['domain_name']) > 0) {
+								if (!empty($_SESSION['domains'][$row['domain_uuid']]['domain_name'])) {
 									$domain = $_SESSION['domains'][$row['domain_uuid']]['domain_name'];
 								}
 								else {

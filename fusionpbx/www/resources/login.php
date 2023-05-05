@@ -25,7 +25,9 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf");
+	$conf_bsd = glob("/usr/localetc/fusionpbx/config.conf");
+	$conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -252,16 +254,16 @@
 //santize the login destination url and set a default value
 	if (isset($_SESSION['login']['destination']['text'])) {
 		$destination_path = parse_url($_SESSION['login']['destination']['text'])['path'];
-		$destination_query = parse_url($_SESSION['login']['destination']['text'])['query'];
+		$destination_query = parse_url($_SESSION['login']['destination']['text'])['query'] ?? '/';
 		$destination_path = preg_replace('#[^a-zA-Z0-9_\-\./]#', '', $destination_path);
 		$destination_query = preg_replace('#[^a-zA-Z0-9_\-\./&=]#', '', $destination_query);
-		$_SESSION['login']['destination']['text'] = (strlen($destination_query) > 0) ? $destination_path.'?'.$destination_query : $destination_path;
+		$_SESSION['login']['destination']['text'] = (!empty($destination_query)) ? $destination_path.'?'.$destination_query : $destination_path;
 	}
 	else {
 		$_SESSION['login']['destination']['text'] = PROJECT_PATH."/core/dashboard/";
 	}
 
-	if (strlen($_REQUEST['path']) > 0) {
+	if (!empty($_REQUEST['path'] ?? '')) {
 		$_SESSION['redirect_path'] = $_REQUEST['path'];
 	}
 

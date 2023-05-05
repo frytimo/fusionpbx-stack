@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -156,7 +156,7 @@
 	}
 
 //normalize the mac address
-	if (isset($device_mac_address) && strlen($device_mac_address) > 0) {
+	if (isset($device_mac_address) && !empty($device_mac_address)) {
 		$device_mac_address = strtolower($device_mac_address);
 		$device_mac_address = preg_replace('#[^a-fA-F0-9./]#', '', $device_mac_address);
 	}

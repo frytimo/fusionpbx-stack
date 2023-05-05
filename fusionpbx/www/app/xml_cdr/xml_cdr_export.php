@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -210,7 +210,7 @@
 				$data_body[$p] .= '<td align="center">';
 				if (permission_exists("xml_cdr_mos")) {
 					$total['rtp_audio_in_mos'] += $fields['rtp_audio_in_mos'];
-					$data_body[$p] .= (strlen($total['rtp_audio_in_mos']) > 0) ? $fields['rtp_audio_in_mos'] : null;
+					$data_body[$p] .= (!empty($total['rtp_audio_in_mos'])) ? $fields['rtp_audio_in_mos'] : null;
 				}
 				$data_body[$p] .= '</td>';
 

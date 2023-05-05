@@ -174,4 +174,4 @@ WORKDIR /
 # Supervisor will run freeswitch
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-CMD ["supervisord"]
+CMD ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]

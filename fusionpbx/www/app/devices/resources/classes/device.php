@@ -226,7 +226,7 @@
 			//set the default template directory
 				if (PHP_OS == "Linux") {
 					//set the default template dir
-						if (strlen($this->template_dir) == 0) {
+						if (empty($this->template_dir)) {
 							if (file_exists('/usr/share/fusionpbx/templates/provision')) {
 								$this->template_dir = '/usr/share/fusionpbx/templates/provision';
 							}
@@ -240,7 +240,7 @@
 				}
 				elseif (PHP_OS == "FreeBSD") {
 					//if the FreeBSD port is installed use the following paths by default.
-						if (strlen($this->template_dir) == 0) {
+						if (empty($this->template_dir)) {
 							if (file_exists('/usr/local/share/fusionpbx/templates/provision')) {
 								$this->template_dir = '/usr/local/share/fusionpbx/templates/provision';
 							}
@@ -254,19 +254,19 @@
 				}
 				elseif (PHP_OS == "NetBSD") {
 					//set the default template_dir
-						if (strlen($this->template_dir) == 0) {
+						if (empty($this->template_dir)) {
 							$this->template_dir = $_SERVER["DOCUMENT_ROOT"].PROJECT_PATH.'/resources/templates/provision';
 						}
 				}
 				elseif (PHP_OS == "OpenBSD") {
 					//set the default template_dir
-						if (strlen($this->template_dir) == 0) {
+						if (empty($this->template_dir)) {
 							$this->template_dir = $_SERVER["DOCUMENT_ROOT"].PROJECT_PATH.'/resources/templates/provision';
 						}
 				}
 				else {
 					//set the default template_dir
-						if (strlen($this->template_dir) == 0) {
+						if (empty($this->template_dir)) {
 							$this->template_dir = $_SERVER["DOCUMENT_ROOT"].PROJECT_PATH.'/resources/templates/provision';
 						}
 				}
@@ -346,7 +346,7 @@
 									$p->delete('device_key_delete', 'temp');
 
 								//write the provision files
-									if (strlen($_SESSION['provision']['path']['text']) > 0) {
+									if (!empty($_SESSION['provision']['path']['text'])) {
 										$prov = new provision;
 										$prov->domain_uuid = $_SESSION['domain_uuid'];
 										$response = $prov->write();
@@ -853,7 +853,7 @@
 									unset($array);
 
 								//write the provision files
-									if (strlen($_SESSION['provision']['path']['text']) > 0) {
+									if (!empty($_SESSION['provision']['path']['text'])) {
 										$prov = new provision;
 										$prov->domain_uuid = $_SESSION['domain_uuid'];
 										$response = $prov->write();

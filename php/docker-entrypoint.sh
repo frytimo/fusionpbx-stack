@@ -1,12 +1,30 @@
-#!/bin/bash
+#!/usr/bin/env sh
 set -e
 
-chown -R fusionpbx:fusionpbx /var/log/freeswitch
-chown -R fusionpbx:fusionpbx /etc/freeswitch
-chown -R fusionpbx:fusionpbx /var/cache/fusionpbx
-chown -R fusionpbx:fusionpbx /var/lib/freeswitch
-mkdir -p /etc/fusionpbx
-mkdir -p /dev/shm/freeswitch
+if [ -d /var/log/freeswitch ]; then
+    chown -R fusionpbx:fusionpbx /var/log/freeswitch
+fi
+
+if [ -d /etc/freeswitch ]; then
+    chown -R fusionpbx:fusionpbx /etc/freeswitch
+fi
+
+if [ -d /var/cache/fusionpbx ]; then
+    chown -R fusionpbx:fusionpbx /var/cache/fusionpbx
+fi
+
+if [ -d /var/lib/freeswitch ]; then
+    chown -R fusionpbx:fusionpbx /var/lib/freeswitch
+fi
+
+if [ ! -d /etc/fusionpbx ]; then
+    mkdir -p /etc/fusionpbx
+fi
+
+if [ ! -d /dev/shm/freeswitch ]; then
+    mkdir -p /dev/shm/freeswitch
+fi
+
 chown -R fusionpbx:fusionpbx /etc/fusionpbx
 chown fusionpbx:fusionpbx /dev/shm/freeswitch
 
@@ -26,7 +44,7 @@ if [ "x$1" = 'xsupervisord' ]; then
     # execute freeswitch with fusionpbx user and group permissions
     #
     #exec gosu fusionpbx /usr/bin/freeswitch -rp -u fusionpbx -g fusionpbx -nonat -nc
-    /usr/bin/supervisord --nodaemon --configuration /etc/supervisord.conf
+    exec "$@"
 fi
 
 if [ "x$1" = "x" ]; then
@@ -34,9 +52,9 @@ if [ "x$1" = "x" ]; then
 fi
 
 if [ "x$1" = "xbash" ]; then
-    exec gosu fusionpbx /bin/bash
+    exec gosu fusionpbx /bin/sh
 fi
 
 if [ "x$1" = "x/bin/bash" ]; then
-    exec gosu fusionpbx /bin/bash
+    exec gosu fusionpbx /bin/sh
 fi

@@ -3,7 +3,7 @@
 //check the permission
 	if (defined('STDIN')) {
 		//set the include path
-		$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+		$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 		set_include_path(parse_ini_file($conf[0])['document.root']);
 	}
 	else {
@@ -150,7 +150,7 @@
 	//$retry_interval = $_SESSION['email_queue']['retry_interval']['numeric'];
 
 //set defaults
-	if (strlen($email_retry_count) == 0) {
+	if (empty($email_retry_count)) {
 		$email_retry_count = 0;
 	}
 

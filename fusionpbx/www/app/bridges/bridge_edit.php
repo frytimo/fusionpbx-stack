@@ -22,7 +22,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -59,7 +59,7 @@
 	}
 
 //process the user data and save it to the database
-	if (count($_POST) > 0 && strlen($_POST["persistformvar"]) == 0) {
+	if (count($_POST) > 0 && empty($_POST["persistformvar"])) {
 
 		//delete the bridge
 			if (permission_exists('bridge_delete')) {
@@ -91,10 +91,10 @@
 
 		//check for all required data
 			$msg = '';
-			if (strlen($bridge_name) == 0) { $msg .= $text['message-required']." ".$text['label-bridge_name']."<br>\n"; }
-			if (strlen($bridge_destination) == 0) { $msg .= $text['message-required']." ".$text['label-bridge_destination']."<br>\n"; }
-			if (strlen($bridge_enabled) == 0) { $msg .= $text['message-required']." ".$text['label-bridge_enabled']."<br>\n"; }
-			if (strlen($msg) > 0 && strlen($_POST["persistformvar"]) == 0) {
+			if (empty($bridge_name)) { $msg .= $text['message-required']." ".$text['label-bridge_name']."<br>\n"; }
+			if (empty($bridge_destination)) { $msg .= $text['message-required']." ".$text['label-bridge_destination']."<br>\n"; }
+			if (empty($bridge_enabled)) { $msg .= $text['message-required']." ".$text['label-bridge_enabled']."<br>\n"; }
+			if (!empty($msg) && empty($_POST["persistformvar"])) {
 				require_once "resources/header.php";
 				require_once "resources/persist_form_var.php";
 				echo "<div align='center'>\n";
@@ -108,7 +108,7 @@
 			}
 
 		//add the bridge_uuid
-			if (strlen($bridge_uuid) == 0) {
+			if (empty($bridge_uuid)) {
 				$bridge_uuid = uuid();
 			}
 
@@ -163,7 +163,7 @@
 	}
 
 //set the defaults
-	if (strlen($bridge_enabled) == 0) { $bridge_enabled = 'true'; }
+	if (empty($bridge_enabled)) { $bridge_enabled = 'true'; }
 
 //create token
 	$object = new token;

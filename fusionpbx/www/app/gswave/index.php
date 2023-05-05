@@ -25,7 +25,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -89,7 +89,7 @@
 
 		//get the username
 			$username = $field['extension'];
-			if (isset($field['number_alias']) && strlen($field['number_alias']) > 0) {
+			if (isset($field['number_alias']) && !empty($field['number_alias'])) {
 				$username = $field['number_alias'];
 			}
 

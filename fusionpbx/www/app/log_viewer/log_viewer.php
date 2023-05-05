@@ -26,7 +26,7 @@
 */
 
 //set the include path
-	$conf = glob("{/usr/local/etc,/etc}/fusionpbx/config.conf", GLOB_BRACE);
+	$conf_linux = glob("/etc/fusionpbx/config.conf"); $conf_bsd = glob("/usr/localetc/fusionpbx/config.conf"); $conf = array_merge($conf_linux, $conf_bsd);
 	set_include_path(parse_ini_file($conf[0])['document.root']);
 
 //includes files
@@ -57,7 +57,7 @@
 	}
 
 //set a default file size
-	if (!isset($_POST['size']) || strlen($_POST['size']) == 0) {
+	if (!isset($_POST['size']) || empty($_POST['size'])) {
 		$_POST['size'] = "32";
 	}
 
@@ -205,7 +205,7 @@
 		/*
 		// removed: duplicate of above
 		if (isset($_POST['submit'])) {
-			if (strlen($_POST['size']) == 0) { $_POST['size'] = "32"; }
+			if (empty($_POST['size'])) { $_POST['size'] = "32"; }
 		}
 		*/
 
@@ -219,7 +219,7 @@
 			else {
 				$user_file_size = $_POST['size'] * 1024;
 			}
-			if (strlen($_REQUEST['filter']) > 0) {
+			if (!empty($_REQUEST['filter'])) {
 				$filter = $_REQUEST['filter'];
 			}
 		}

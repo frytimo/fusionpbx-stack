@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env sh
+
+. /docker-entrypoint.d/globals.sh
 
 cat << EOF > /etc/freeswitch/autoload_configs/modules.conf.xml
 <configuration name="modules.conf" description="Modules">
