@@ -50,19 +50,20 @@
 		return $con;
 	}
 
-	function has_table(PDO $con, string $table) {
-		$exists = true;
-		ob_start();
-		try {
-			$sql = "select * from $table";
-			$statement = $con->prepare($sql);
-			$statement->execute();
-		} catch (Exception $e) {
-			$exists = false;
-		} finally {
-			ob_end_clean();
+	function has_table($con, $table_name, $schema = "public") {
+		$statement = $con->prepare("SELECT COUNT(*)"
+			. " FROM information_schema.tables"
+			. " WHERE table_schema LIKE '$schema' AND"
+			. " table_type LIKE 'BASE_TABLE' AND"
+			. " table_name = :table_name"
+			. " LIMIT 1");
+		$success = $statement->execute(['table_name' => $table_name]);
+		if ($success !== false) {
+			$result = $statement->fetchAll(PDO::FETCH_COLUMN);
+			if (!empty($result) && count($result) > 0 && $result[0] === 1)
+				return true;
 		}
-		return $exists;
+		return false;
 	}
 
 	function db_execute($con, $sql, ?int $fetch_type = null) {
@@ -161,6 +162,7 @@
 
 	$con = connect();
 	if(!has_table($con, 'v_domains')) {
+		echo "Creating v_domains\n";
 		write_schema($con, get_schema_from_app_config(CORE_DIR . '/domains'));
 		db_execute($con, "insert into v_domains("
 			. "domain_uuid"
@@ -174,7 +176,12 @@
 	}
 	$domain_uuid = db_execute($con, "select domain_uuid from v_domains where domain_name='$domain_name'", 7);
 
+	if(empty($domain_uuid)) {
+		$domain_uuid = uuid();
+	}
+
 	if(!has_table($con, 'v_users')) {
+		echo "Creating v_users\n";
 		write_schema($con, get_schema_from_app_config(CORE_DIR . '/users'));
 		db_execute($con, "insert into v_users("
 			. "user_uuid"
@@ -194,6 +201,7 @@
 	$sadmin_uuid = db_execute($con, "select user_uuid from v_users where username='admin'", 7);
 	
 	if(!has_table($con, 'v_groups')) {
+		echo "Creating v_groups\n";
 		write_schema($con, get_schema_from_app_config(CORE_DIR . '/groups'));
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','superadmin',80)");
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','admin',50)");
@@ -224,9 +232,11 @@
 	}
 
 	if(!has_table($con, 'v_software')) 
+		echo "Creating v_software\n";
 		write_schema($con, get_schema_from_app_config(CORE_DIR.'/software'));
 	
 	if(!has_table($con, 'v_default_settings'))
+		echo "Creating v_default_settings\n";
 		write_schema($con, get_schema_from_app_config(CORE_DIR.'/default_settings'));
 
 	$base = get_switch_setting($con, 'base');
@@ -274,6 +284,7 @@
 
 	// make sure the v_settings table exists
 	if(!has_table($con, 'v_settings')) {
+		echo "Creating v_settings\n";
 		write_schema($con, get_schema_from_app_config(APP_DIR . '/settings'));
 	}
 
