@@ -109,12 +109,13 @@ RUN cd /usr/local/src/freeswitch \
   --localstatedir=/var \
   --sysconfdir=/etc \
   --with-openssl \
-  --enable-core-pgsql-support
+  --enable-core-pgsql-support \
+  --enable-fatal-warnings=no
 
 #
 # make and install freeswitch using all cores
 #
-RUN cd /usr/local/src/freeswitch && make -i -j$(nproc)
+RUN cd /usr/local/src/freeswitch && make CFLAGS="-Wno-error=format-truncation" CXXFLAGS="-Wno-error=format-truncation" -i -j$(nproc)
 RUN cd /usr/local/src/freeswitch && make install
 
 #

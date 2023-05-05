@@ -148,3 +148,4 @@ cat << EOF > /etc/freeswitch/autoload_configs/modules.conf.xml
 
   </modules>
 </configuration>
+EOF
