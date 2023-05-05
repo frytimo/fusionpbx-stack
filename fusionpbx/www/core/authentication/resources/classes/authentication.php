@@ -15,6 +15,7 @@ class authentication {
 	public $domain_name;
 	public $username;
 	public $password;
+	public $debug;
 
 	/**
 	 * Called when the object is created

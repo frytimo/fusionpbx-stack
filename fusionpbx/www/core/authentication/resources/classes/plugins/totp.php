@@ -18,7 +18,7 @@ class plugin_totp {
 	public $user_email;
 	public $contact_uuid;
 	private $user_totp_secret;
-
+	
 	/**
 	 * time based one time password aka totp
 	 * @return array [authorized] => true or false

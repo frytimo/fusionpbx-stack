@@ -85,7 +85,7 @@
 	$order = $_GET["order"];
 
 //get the search
-	$search = strtolower($_GET["search"]);
+	$search = strtolower($_GET["search"] ?? '');
 
 //define select count query
 	$sql = "select count(*) from v_extensions ";
