@@ -479,10 +479,10 @@
 	unset($sql, $parameters);
 
 //replace the dash with a space
-	$fax_name = str_replace("-", " ", $fax_name);
+	$fax_name = str_replace("-", " ", "" . $fax_name);
 
 //build the fax_emails array
-	$fax_emails = explode(',',$fax_email);
+	$fax_emails = explode(',', "" . $fax_email);
 
 //set the dialplan_uuid
 	if (!is_uuid($dialplan_uuid)) {
@@ -1057,7 +1057,7 @@
 				echo "		<tr>";
 				echo "			<td id='authorized_senders'>";
 
-				if (substr_count($fax_email_outbound_authorized_senders, ',') > 0) {
+				if (substr_count($fax_email_outbound_authorized_senders ?? '', ',') > 0) {
 					$senders = explode(',', $fax_email_outbound_authorized_senders);
 				}
 				else {

@@ -128,7 +128,7 @@
 	$order = $_GET["order"];
 
 //add the search term
-	$search = strtolower($_GET["search"]);
+	$search = strtolower($_GET["search"] ?? '');
 	if (!empty($search)) {
 		if (is_numeric($search)) {
 			$sql_search .= "and contact_uuid in ( ";

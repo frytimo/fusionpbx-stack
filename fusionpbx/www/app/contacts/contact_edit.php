@@ -1596,12 +1596,12 @@ if (permission_exists('contact_phone_view')) {
 
 		$call = "send_cmd('";
 		$call .= PROJECT_PATH."/app/click_to_call/click_to_call.php";
-		$call .= "?src_cid_name=".urlencode($row['phone_number']);
-		$call .= "&src_cid_number=".urlencode($row['phone_number']);
-		$call .= "&dest_cid_name=".urlencode($_SESSION['user']['extension'][0]['outbound_caller_id_name']);
-		$call .= "&dest_cid_number=".urlencode($_SESSION['user']['extension'][0]['outbound_caller_id_number']);
-		$call .= "&src=".urlencode($_SESSION['user']['extension'][0]['user']);
-		$call .= "&dest=".urlencode($row['phone_number']);
+		$call .= "?src_cid_name=".urlencode($row['phone_number'] ?? '');
+		$call .= "&src_cid_number=".urlencode($row['phone_number'] ?? '');
+		$call .= "&dest_cid_name=".urlencode($_SESSION['user']['extension'][0]['outbound_caller_id_name'] ?? '');
+		$call .= "&dest_cid_number=".urlencode($_SESSION['user']['extension'][0]['outbound_caller_id_number'] ?? '');
+		$call .= "&src=".urlencode($_SESSION['user']['extension'][0]['user'] ?? '');
+		$call .= "&dest=".urlencode($row['phone_number'] ?? '');
 		$call .= "&rec=false";
 		$call .= "&ringback=us-ring";
 		$call .= "&auto_answer=true";
@@ -1615,9 +1615,9 @@ if (permission_exists('contact_phone_view')) {
 		echo "		<br>\n";
 		echo "		<div style='clear: both; margin-bottom: 25px;'></div>\n";
 
-		echo "		<input type='hidden' name='contact_phones[$x][domain_uuid]' value=\"".escape($row["domain_uuid"])."\">\n";
-		echo "		<input type='hidden' name='contact_phones[$x][contact_uuid]' value=\"".escape($row["contact_uuid"])."\">\n";
-		echo "		<input type='hidden' name='contact_phones[$x][contact_phone_uuid]' value=\"".escape($row["contact_phone_uuid"])."\">\n";
+		echo "		<input type='hidden' name='contact_phones[$x][domain_uuid]' value=\"".escape($row["domain_uuid"] ?? '')."\">\n";
+		echo "		<input type='hidden' name='contact_phones[$x][contact_uuid]' value=\"".escape($row["contact_uuid"] ?? '')."\">\n";
+		echo "		<input type='hidden' name='contact_phones[$x][contact_phone_uuid]' value=\"".escape($row["contact_phone_uuid"] ?? '')."\">\n";
 
 		echo "		<div class='label'>\n";
 		echo "			".$text['label-phone_label']."\n";
@@ -2180,7 +2180,7 @@ if (permission_exists('contact_url_view')) {
 
 		echo 					(is_array($url_label_options)) ? implode("\n", $url_label_options) : null;
 		echo "				</select>\n";
-		echo "				<input type='text' class='formfld' ".(($url_label_found || $url_label == '') ? "style='display: none;'" : null)." name='url_label_custom' id='url_label_custom' value=\"".((!$url_label_found) ? htmlentities($url_label) : null)."\">\n";
+		echo "				<input type='text' class='formfld' ".(($url_label_found || $url_label == '') ? "style='display: none;'" : null)." name='url_label_custom' id='url_label_custom' value=\"".((!$url_label_found) ? htmlentities($url_label ?? '') : null)."\">\n";
 		//echo "				<input type='button' id='btn_toggle_label' class='btn' alt='".$text['button-back']."' value='&#9665;' onclick=\"toggle_custom('url_label');\">\n";
 		echo "			</div>\n";
 
