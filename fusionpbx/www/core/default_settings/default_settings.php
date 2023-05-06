@@ -47,7 +47,7 @@
 
 //get the http post data
 	$search = $_REQUEST['search'];
-	$default_setting_category = $_REQUEST['default_setting_category'];
+	$default_setting_category = $_REQUEST['default_setting_category'] ?? '';
 	if (is_array($_POST['default_settings'])) {
 		$action = $_POST['action'];
 		$domain_uuid = $_POST['domain_uuid'];
@@ -55,8 +55,8 @@
 	}
 
 //sanitize the variables
-	$action = preg_replace('#[^a-zA-Z0-9_\-\.]#', '', $action);
-	$search = preg_replace('#[^a-zA-Z0-9_\-\. ]#', '', $search);
+	$action = preg_replace('#[^a-zA-Z0-9_\-\.]#', '', "" . $action);
+	$search = preg_replace('#[^a-zA-Z0-9_\-\. ]#', '', "" . $search);
 	$default_setting_category = preg_replace('#[^a-zA-Z0-9_\-\.]#', '', $default_setting_category);
 
 //build the query string
@@ -465,7 +465,7 @@
 				echo "		[...]\n";
 			}
 			else if ($subcategory == 'password' || substr_count($subcategory, '_password') > 0 || $category == "login" && $subcategory == "password_reset_key" && $name == "text" || substr_count($subcategory, '_secret') > 0) {
-				echo "		".str_repeat('*', strlen($row['default_setting_value']));
+				echo "		".str_repeat('*', strlen($row['default_setting_value'] ?? ''));
 			}
 			else if ($category == 'theme' && $subcategory == 'button_icons' && $name == 'text') {
 				echo "		".$text['option-button_icons_'.$row['default_setting_value']]."\n";
