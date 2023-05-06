@@ -68,19 +68,19 @@
 		$parameters['database_transaction_uuid'] = $database_transaction_uuid;
 		$database = new database;
 		$row = $database->select($sql, $parameters, 'row');
-		if (is_array($row) && @sizeof($row) != 0) {
-			$user_uuid = $row["user_uuid"];
-			$app_name = $row["app_name"];
-			$app_uuid = $row["app_uuid"];
-			$domain_name = $row["domain_name"];
-			$username = $row["username"];
-			$transaction_code = $row["transaction_code"];
-			$transaction_address = $row["transaction_address"];
-			$transaction_type = $row["transaction_type"];
-			$transaction_date = $row["transaction_date"];
-			$transaction_old = $row["transaction_old"];
-			$transaction_new = $row["transaction_new"];
-			$transaction_result = $row["transaction_result"];
+		if (!empty($row)) {
+			$user_uuid = $row["user_uuid"] ?? '';
+			$app_name = $row["app_name"] ?? '';
+			$app_uuid = $row["app_uuid"] ?? '';
+			$domain_name = $row["domain_name"] ?? '';
+			$username = $row["username"] ?? '';
+			$transaction_code = $row["transaction_code"] ?? '';
+			$transaction_address = $row["transaction_address"] ?? '';
+			$transaction_type = $row["transaction_type"] ?? '';
+			$transaction_date = $row["transaction_date"] ?? '';
+			$transaction_old = $row["transaction_old"] ?? '';
+			$transaction_new = $row["transaction_new"] ?? '';
+			$transaction_result = $row["transaction_result"] ?? '';
 		}
 		unset($sql, $parameters, $row);
 	}
