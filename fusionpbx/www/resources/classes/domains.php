@@ -601,12 +601,6 @@ if (!class_exists('domains')) {
 		 */
 		public function upgrade() {
 
-			//connect to the database if not connected
-				if (!$this->db) {
-					$database = new database;
-					$database->connect();
-				}
-
 			//get the variables
 				$config = new config;
 				$config_path = $config->find();
