@@ -73,7 +73,7 @@ if (!class_exists('domains')) {
 		 * delete rows from the database
 		 */
 		public function delete($records) {
-			if (permission_exists($this->name.'_delete')) {
+			if (permission_exists(self::NAME.'_delete')) {
 
 				//add multi-lingual support
 					$language = new text;
@@ -83,7 +83,7 @@ if (!class_exists('domains')) {
 					$token = new token;
 					if (!$token->validate($_SERVER['PHP_SELF'])) {
 						message::add($text['message-invalid_token'],'negative');
-						header('Location: '.$this->location);
+						header('Location: '.self::LOCATION);
 						exit;
 					}
 
@@ -275,8 +275,8 @@ if (!class_exists('domains')) {
 							if (is_array($domain_array) && @sizeof($domain_array) != 0) {
 								//execute delete
 									$database = new database;
-									$database->app_name = $this->app_name;
-									$database->app_uuid = $this->app_uuid;
+									$database->app_name = self::APP_NAME;
+									$database->app_uuid = self::APP_UUID;
 									$database->delete($domain_array);
 									unset($array);
 
@@ -292,7 +292,7 @@ if (!class_exists('domains')) {
 		 * toggle a field between two values
 		 */
 		public function toggle($records) {
-			if (permission_exists($this->name.'_edit')) {
+			if (permission_exists(self::NAME.'_edit')) {
 
 				//add multi-lingual support
 					$language = new text;
@@ -302,7 +302,7 @@ if (!class_exists('domains')) {
 					$token = new token;
 					if (!$token->validate($_SERVER['PHP_SELF'])) {
 						message::add($text['message-invalid_token'],'negative');
-						header('Location: '.$this->location);
+						header('Location: '.self::LOCATION);
 						exit;
 					}
 
@@ -315,8 +315,8 @@ if (!class_exists('domains')) {
 								}
 							}
 							if (is_array($uuids) && @sizeof($uuids) != 0) {
-								$sql = "select ".$this->name."_uuid as uuid, ".$this->toggle_field." as toggle from v_".$this->table." ";
-								$sql .= "where ".$this->name."_uuid in (".implode(', ', $uuids).") ";
+								$sql = "select ".self::NAME."_uuid as uuid, ".self::TOGGLE_FIELD." as toggle from v_".self::TABLE." ";
+								$sql .= "where ".self::NAME."_uuid in (".implode(', ', $uuids).") ";
 								$database = new database;
 								$rows = $database->select($sql, $parameters, 'all');
 								if (is_array($rows) && @sizeof($rows) != 0) {
@@ -331,8 +331,8 @@ if (!class_exists('domains')) {
 							$x = 0;
 							foreach($states as $uuid => $state) {
 								//create the array
-									$array[$this->table][$x][$this->name.'_uuid'] = $uuid;
-									$array[$this->table][$x][$this->toggle_field] = $state == $this->toggle_values[0] ? $this->toggle_values[1] : $this->toggle_values[0];
+									$array[self::TABLE][$x][self::NAME.'_uuid'] = $uuid;
+									$array[self::TABLE][$x][self::TOGGLE_FIELD] = $state == self::TOGGLE_VALUES[0] ? self::TOGGLE_VALUES[1] : self::TOGGLE_VALUES[0];
 
 								//increment the id
 									$x++;
@@ -342,8 +342,8 @@ if (!class_exists('domains')) {
 							if (is_array($array) && @sizeof($array) != 0) {
 								//save the array
 									$database = new database;
-									$database->app_name = $this->app_name;
-									$database->app_uuid = $this->app_uuid;
+									$database->app_name = self::APP_NAME;
+									$database->app_uuid = self::APP_UUID;
 									$database->save($array);
 									unset($array);
 
@@ -359,7 +359,7 @@ if (!class_exists('domains')) {
 		 * copy rows from the database
 		 */
 		public function copy($records) {
-			if (permission_exists($this->name.'_add')) {
+			if (permission_exists(self::NAME.'_add')) {
 
 				//add multi-lingual support
 					$language = new text;
@@ -369,7 +369,7 @@ if (!class_exists('domains')) {
 					$token = new token;
 					if (!$token->validate($_SERVER['PHP_SELF'])) {
 						message::add($text['message-invalid_token'],'negative');
-						header('Location: '.$this->location);
+						header('Location: '.self::LOCATION);
 						exit;
 					}
 
@@ -385,19 +385,19 @@ if (!class_exists('domains')) {
 
 						//create the array from existing data
 							if (is_array($uuids) && @sizeof($uuids) != 0) {
-								$sql = "select * from v_".$this->table." ";
-								$sql .= "where ".$this->name."_uuid in (".implode(', ', $uuids).") ";
+								$sql = "select * from v_".self::TABLE." ";
+								$sql .= "where ".self::NAME."_uuid in (".implode(', ', $uuids).") ";
 								$database = new database;
 								$rows = $database->select($sql, $parameters, 'all');
 								if (is_array($rows) && @sizeof($rows) != 0) {
 									$x = 0;
 									foreach ($rows as $row) {
 										//copy data
-											$array[$this->table][$x] = $row;
+											$array[self::TABLE][$x] = $row;
 
 										//add copy to the description
-											$array[$this->table][$x][$this->name.'_uuid'] = uuid();
-											$array[$this->table][$x][$this->name.'_description'] = trim($row[$this->name.'_description']).' ('.$text['label-copy'].')';
+											$array[self::TABLE][$x][self::NAME.'_uuid'] = uuid();
+											$array[self::TABLE][$x][self::NAME.'_description'] = trim($row[self::NAME.'_description']).' ('.$text['label-copy'].')';
 
 										//increment the id
 											$x++;
@@ -410,8 +410,8 @@ if (!class_exists('domains')) {
 							if (is_array($array) && @sizeof($array) != 0) {
 								//save the array
 									$database = new database;
-									$database->app_name = $this->app_name;
-									$database->app_uuid = $this->app_uuid;
+									$database->app_name = self::APP_NAME;
+									$database->app_uuid = self::APP_UUID;
 									$database->save($array);
 									unset($array);
 
@@ -789,5 +789,3 @@ if (!class_exists('domains')) {
 		} //end settings method
 	}
 }
-
-?>
