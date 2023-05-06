@@ -85,7 +85,7 @@
 	$order = $_GET["order"];
 
 //add the search string
-	$search = strtolower($_GET["search"]);
+	$search = strtolower($_GET["search"] ?? '');
 	if (!empty($search)) {
 		$sql_search = "where (";
 		$sql_search .= "	lower(var_category) like :search ";
