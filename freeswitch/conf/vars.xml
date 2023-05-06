@@ -61,34 +61,34 @@
 <X-PRE-PROCESS cmd="set" data="fi-ring=%(1000,4000,425)" />
 <X-PRE-PROCESS cmd="set" data="fr-ring=%(1500,3500,440)" />
 
-<!-- Security -->
-<X-PRE-PROCESS cmd="set" data="disable_system_api_commands=true" />
-<X-PRE-PROCESS cmd="set" data="disable_system_app_commands=true" />
-
 <!-- SIP -->
 <X-PRE-PROCESS cmd="set" data="unroll_loops=true" />
 <X-PRE-PROCESS cmd="set" data="sip_tls_version=tlsv1,tlsv1.1,tlsv1.2" />
 
 <!-- SIP Profile: External -->
-<X-PRE-PROCESS cmd="set" data="external_ssl_enable=false" />
 <X-PRE-PROCESS cmd="set" data="external_ssl_dir=$${conf_dir}/tls" />
+<X-PRE-PROCESS cmd="set" data="external_ssl_enable=false" />
 
 <!-- SIP Profile: Internal -->
 <X-PRE-PROCESS cmd="set" data="internal_ssl_dir=$${conf_dir}/tls" />
 <X-PRE-PROCESS cmd="set" data="internal_ssl_enable=false" />
 
+<!-- Security -->
+<X-PRE-PROCESS cmd="set" data="disable_system_app_commands=true" />
+<X-PRE-PROCESS cmd="set" data="disable_system_api_commands=true" />
+
 <!-- Sound -->
 <X-PRE-PROCESS cmd="set" data="sound_prefix=$${sounds_dir}/en/us/callie" />
 
 <!-- Tones -->
-<X-PRE-PROCESS cmd="set" data="vacant-uk-tone=%(330,15,950);%(330,15,1400);%(330,1000,1800)" />
 <X-PRE-PROCESS cmd="set" data="busy-us-tone=%(500,500,480,620)" />
-<X-PRE-PROCESS cmd="set" data="busy-au-tone=v=-13;%(375,375,420);v=-23;%(375,375,420)" />
-<X-PRE-PROCESS cmd="set" data="bong-us-tone=v=-7;%(100,0,941.0,1477.0);v=-7;>=2;+=.1;%(1400,0,350,440)" />
+<X-PRE-PROCESS cmd="set" data="vacant-uk-tone=%(330,15,950);%(330,15,1400);%(330,1000,1800)" />
 <X-PRE-PROCESS cmd="set" data="vacant-us-tone=%(274,0,913.8);%(274,0,1370.6);%(380,0,1776.7)" />
+<X-PRE-PROCESS cmd="set" data="bong-us-tone=v=-7;%(100,0,941.0,1477.0);v=-7;>=2;+=.1;%(1400,0,350,440)" />
+<X-PRE-PROCESS cmd="set" data="busy-au-tone=v=-13;%(375,375,420);v=-23;%(375,375,420)" />
 
 <!-- XMPP -->
-<X-PRE-PROCESS cmd="set" data="bind_server_ip=auto" />
 <X-PRE-PROCESS cmd="set" data="xmpp_client_profile=xmppc" />
+<X-PRE-PROCESS cmd="set" data="bind_server_ip=auto" />
 <X-PRE-PROCESS cmd="set" data="xmpp_server_profile=xmpps" />
 

@@ -234,9 +234,9 @@
 								//prepare the xml
 									if (!empty($xml_string)) {
 										//replace the variables
-											$length = (is_numeric($_SESSION["security"]["pin_length"]["var"])) ? $_SESSION["security"]["pin_length"]["var"] : 8;
-											$xml_string = str_replace("{v_context}", $domain['domain_name'], $xml_string);
-											$xml_string = str_replace("{v_pin_number}", generate_password($length, 1), $xml_string);
+											$length = intval($_SESSION["security"]["pin_length"]["var"]) ?? 8;
+											$xml_string = str_replace("{v_context}", $domain['domain_name'],  "" .$xml_string);
+											$xml_string = str_replace("{v_pin_number}", generate_password($length, 1), "" . $xml_string);
 
 										//convert the xml string to an xml object
 											$xml = simplexml_load_string($xml_string);
@@ -283,7 +283,7 @@
 
 										//get the dialplan context
 											$dialplan_context = $dialplan['@attributes']['context'];
-											$dialplan_context = str_replace("\${domain_name}", $domain['domain_name'], $dialplan_context);
+											$dialplan_context = str_replace("\${domain_name}", $domain['domain_name'] ?? '', '' . $dialplan_context);
 
 										//set the domain_uuid
 											if ($dialplan_global) {
@@ -554,9 +554,9 @@
 											}
 											else {
 												$regex_match = true;
-												$regex_match_1 = $matches[1][0];
-												$regex_match_2 = $matches[2][0];
-												$regex_match_3 = $matches[3][0];
+												$regex_match_1 = $matches[1][0] ?? '';
+												$regex_match_2 = $matches[2][0] ?? '';
+												$regex_match_3 = $matches[3][0] ?? '';
 											}
 										}
 									}
@@ -571,9 +571,9 @@
 										//process the $x detail data variables
 											if ($field['dialplan_detail_tag'] == "action" && $field['dialplan_detail_type'] == "bridge" && $dialplan_detail_data != "\${enum_auto_route}") {
 												$dialplan_detail_data = $field['dialplan_detail_data'];
-												$dialplan_detail_data = str_replace("\$1", $regex_match_1, $dialplan_detail_data);
-												$dialplan_detail_data = str_replace("\$2", $regex_match_2, $dialplan_detail_data);
-												$dialplan_detail_data = str_replace("\$3", $regex_match_3, $dialplan_detail_data);
+												$dialplan_detail_data = str_replace("\$1", $regex_match_1, '' . $dialplan_detail_data);
+												$dialplan_detail_data = str_replace("\$2", $regex_match_2, '' . $dialplan_detail_data);
+												$dialplan_detail_data = str_replace("\$3", $regex_match_3, '' . $dialplan_detail_data);
 												$this->bridges = $dialplan_detail_data;
 											}
 									} //if
@@ -709,7 +709,7 @@
 										//$dialplan_detail_order = $row["dialplan_detail_order;
 
 									//remove $$ and replace with $
-										$dialplan_detail_data = str_replace("$$", "$", $dialplan_detail_data);
+										$dialplan_detail_data = str_replace("$$", "$", "" . $dialplan_detail_data);
 
 									//get the dialplan detail inline
 										$detail_inline = "";

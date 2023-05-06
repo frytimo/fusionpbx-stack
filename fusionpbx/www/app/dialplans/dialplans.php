@@ -59,6 +59,8 @@
 //get the app uuid
 	if (is_uuid($_REQUEST["app_uuid"])) {
 		$app_uuid = $_REQUEST["app_uuid"];
+	} else {
+		$app_uuid = "";
 	}
 
 //process the http post data by action

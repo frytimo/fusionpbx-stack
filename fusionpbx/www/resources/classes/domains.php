@@ -36,31 +36,38 @@
 if (!class_exists('domains')) {
 	class domains {
 
+		//assign the variables
+		const APP_NAME = 'domains';
+		const APP_UUID = '8b91605b-f6d2-42e6-a56d-5d1ded01bb44';
+		const NAME = 'domain';
+		const TABLE = 'domains';
+		const TOGGLE_FIELD = 'domain_enabled';
+		const TOGGLE_VALUES = ['true','false'];
+		const LOCATION = 'domains.php';
+
+		/**
+		 * backwards compatibility
+		 */
+		public function __get($name) {
+			switch($name) {
+				case 'app_name':
+				case 'app_uuid':
+				case 'name':
+				case 'table':
+				case 'toggle_field':
+				case 'toggle_values':
+				case 'location':
+					$value = strtoupper($name);
+					return self::$$value;
+				default:
+					return self::$$name;
+			}
+		}
+
 		/**
 		* declare the variables
 		*/
-		private $app_name;
-		private $app_uuid;
-		private $name;
-		private $table;
-		private $toggle_field;
-		private $toggle_values;
-		private $location;
 		public $display_type;
-
-		/**
-		 * called when the object is created
-		 */
-		public function __construct() {
-			//assign the variables
-				$this->app_name = 'domains';
-				$this->app_uuid = '8b91605b-f6d2-42e6-a56d-5d1ded01bb44';
-				$this->name = 'domain';
-				$this->table = 'domains';
-				$this->toggle_field = 'domain_enabled';
-				$this->toggle_values = ['true','false'];
-				$this->location = 'domains.php';
-		}
 
 		/**
 		 * delete rows from the database

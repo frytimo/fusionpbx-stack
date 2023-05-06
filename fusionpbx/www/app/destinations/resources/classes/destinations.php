@@ -643,8 +643,8 @@ if (!class_exists('destinations')) {
 			}
 
 			//remove special characters from the name
-			$destination_id = str_replace("]", "", $destination_name);
-			$destination_id = str_replace("[", "_", $destination_id);
+			$destination_id = str_replace("]", "", '' . $destination_name);
+			$destination_id = str_replace("[", "_", '' . $destination_id);
 
 			//set default to false
 			$select_found = false;
@@ -653,7 +653,7 @@ if (!class_exists('destinations')) {
 
 				$name = $row['name'];
 				$label = $row['label'];
-				$destination = $row['field']['destination'];
+				$destination = $row['field']['destination'] ?? '';
 
 				//add multi-lingual support
 				if (file_exists($_SERVER["PROJECT_ROOT"]."/app/".$name."/app_languages.php")) {
@@ -691,9 +691,9 @@ if (!class_exists('destinations')) {
 									}
 								}
 								else {
-									$select_value = str_replace("\${".$key."}", $data[$key], $select_value);
+									$select_value = str_replace("\${".$key."}", $data[$key] ?? '', $select_value);
 									if (empty($data['label'])) {
-										$select_label = str_replace("\${".$key."}", $data[$key], $select_label);
+										$select_label = str_replace("\${".$key."}", $data[$key] ?? '', $select_label);
 									}
 									else {
 										$label = $data['label'];
@@ -722,7 +722,7 @@ if (!class_exists('destinations')) {
 				}
 			}
 			if (!$select_found) {
-				$destination_label = str_replace(":", " ", $destination_value);
+				$destination_label = str_replace(":", " ", '' . $destination_value);
 				$destination_label = str_replace("menu-exec-app", "", $destination_label);
 				$destination_label = str_replace("transfer", "", $destination_label);
 				$destination_label = str_replace("XML ".$this->domain_name, "", $destination_label);
