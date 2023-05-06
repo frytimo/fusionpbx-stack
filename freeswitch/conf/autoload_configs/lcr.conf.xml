@@ -4,42 +4,5 @@
     <param name="odbc-dsn" value="pgsql://hostaddr=db port=5432 dbname=fusionpbx user=fusionpbx password=fusionpbx"/>
   </settings>
     <profiles>
-      <profile name="qual_rel">
-        <param name="id" value="1"/>
-        <param name="order_by" value="quality,reliability"/>
-      </profile>
-      <profile name="rel_qual">
-        <param name="id" value="2"/>
-        <param name="order_by" value="reliability,quality"/>
-      </profile>
-      <profile name="default">
-        <param name="export_fields" value="nibble_account,nibble_rate,nibble_increment,call_buy,call_sell"/>
-        <param name="custom_sql" value="SELECT l.lcr_digits
-       ,c.carrier_name AS lcr_carrier_name
-       ,l.lcr_sell_rate as lcr_rate_field
-       ,cg.prefix AS lcr_gw_prefix
-       , cg.suffix AS lcr_gw_suffix
-       ,l.lcr_lead_strip
-       ,l.lcr_trail_strip
-       ,l.lcr_prefix
-       ,l.lcr_suffix
-       ,'${accountcode}' as nibble_account
-       ,l.lcr_sell_rate AS nibble_rate
-       ,l.lcr_sell_rate AS call_sell
-       ,l.lcr_buy_rate AS call_buy
-       ,l.lcr_talk_increment AS nibble_increment
-  FROM v_lcr l
-    JOIN v_carriers c ON l.carrier_uuid=c.carrier_uuid
-    JOIN v_carrier_gateways cg ON c.carrier_uuid=cg.carrier_uuid
-  WHERE c.carrier_enabled = 'true' AND cg.enabled = 'true' AND l.lcr_enabled = 'true'
-    AND lcr_digits IN (${lcr_query_expanded_digits})
-    AND CURRENT_TIMESTAMP BETWEEN lcr_date_start AND lcr_date_end
-  ORDER BY lcr_digits DESC, lcr_sell_rate;"/>
-        <param name="id" value="3"/>
-        <param name="order_by" value="rate"/>
-      </profile>
-      <profile name="rate">
-        <param name="order_by" value="rate"/>
-      </profile>
   </profiles>
 </configuration>
