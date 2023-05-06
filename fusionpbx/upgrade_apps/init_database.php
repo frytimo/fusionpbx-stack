@@ -485,9 +485,9 @@
 EOF;
 
 	try {
-	$fhandle = fopen('/etc/freeswitch/autoload_configs/modules.conf.xml', w);
-	fwrite($fhandle, $module_data);
-	fclose($fhandle);
+		$fhandle = fopen('/etc/freeswitch/autoload_configs/modules.conf.xml', w);
+		fwrite($fhandle, $module_data);
+		fclose($fhandle);
 	} catch (\Throwable $e) {
 		// do nothing
 	}
