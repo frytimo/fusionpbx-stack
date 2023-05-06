@@ -5,7 +5,7 @@ FROM php:${PHP_VERSION}
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 # These are some packages that contain commands FusionPBX runs in a shell
-RUN if [ -z $(which apk) ]; then apt update && apt install procps uptimed lsb-release; else apk update && apk add procps uptimed; fi
+RUN if [ -z $(which apk) ]; then apt update && apt install -y procps uptimed lsb-release; else apk update && apk add procps uptimed; fi
 
 ARG XDEBUG_VERSION=3.2.1
 # Install Postgres extension
@@ -34,7 +34,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
  zip
 
 # Install Supervisor
-RUN if [ -z $(which apk) ]; then apt update && apt install supervisor; else apk add supervisor && mkdir /etc/supervisor.d; fi
+RUN if [ -z $(which apk) ]; then apt update && apt install -y supervisor gosu; else apk add supervisor && mkdir /etc/supervisor.d; fi
 
 # Create user and group
 RUN if [ -z $(which apk) ]; then addgroup -q --gid 1000 fusionpbx && adduser --shell /bin/bash -q --no-create-home --uid 1000 --gid 1000 fusionpbx; else addgroup -S -g 1000 fusionpbx && adduser -S -D -u 1000 -G fusionpbx fusionpbx; fi

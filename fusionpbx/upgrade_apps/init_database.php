@@ -160,6 +160,14 @@
 			);
 	}
 
+
+	//startup
+	echo "+-----------------+\n";
+	echo "|+---------------+|\n";
+	echo "||  STARTING UP  ||\n";
+	echo "|+---------------+|\n";
+	echo "+-----------------+\n";
+
 	$con = connect();
 	if(!has_table($con, 'v_domains')) {
 		echo "Creating v_domains\n";
@@ -491,3 +499,12 @@ EOF;
 	} catch (\Throwable $e) {
 		// do nothing
 	}
+
+
+
+	//finish
+	echo "+----------------------------+\n";
+	echo "|+--------------------------+|\n";
+	echo "||  DATABASE INIT FINISHED  ||\n";
+	echo "|+--------------------------+|\n";
+	echo "+----------------------------+\n";

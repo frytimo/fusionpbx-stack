@@ -47,14 +47,4 @@ if [ "x$1" = 'xsupervisord' ]; then
     exec "$@"
 fi
 
-if [ "x$1" = "x" ]; then
-    exec gosu fusionpbx /usr/bin/fs_cli
-fi
-
-if [ "x$1" = "xbash" ]; then
-    exec gosu fusionpbx /bin/sh
-fi
-
-if [ "x$1" = "x/bin/bash" ]; then
-    exec gosu fusionpbx /bin/sh
-fi
+exec "$@"
