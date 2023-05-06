@@ -46,6 +46,7 @@ if (!class_exists('domains')) {
 		private $toggle_field;
 		private $toggle_values;
 		private $location;
+		public $display_type;
 
 		/**
 		 * called when the object is created
