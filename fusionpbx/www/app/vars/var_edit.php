@@ -166,14 +166,14 @@
 		$database = new database;
 		$row = $database->select($sql, $parameters, 'row');
 		if (is_array($row) && @sizeof($row) != 0) {
-			$var_category = $row["var_category"];
-			$var_name = $row["var_name"];
-			$var_value = $row["var_value"];
-			$var_command = $row["var_command"];
-			$var_hostname = $row["var_hostname"];
-			$var_enabled = $row["var_enabled"];
-			$var_order = $row["var_order"];
-			$var_description = base64_decode($row["var_description"]);
+			$var_category = $row["var_category"] ?? '';
+			$var_name = $row["var_name"] ?? '';
+			$var_value = $row["var_value"] ?? '';
+			$var_command = $row["var_command"] ?? '';
+			$var_hostname = $row["var_hostname"] ?? '';
+			$var_enabled = $row["var_enabled"] ?? '';
+			$var_order = $row["var_order"] ?? '';
+			$var_description = base64_decode($row["var_description"] ?? '');
 		}
 		unset($sql, $parameters);
 	}
