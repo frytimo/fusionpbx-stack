@@ -994,7 +994,7 @@
 	}
 
 //change toll allow delimiter
-	$toll_allow = str_replace(':',',', $toll_allow);
+	$toll_allow = str_replace(':',',', "" . $toll_allow);
 
 //set the defaults
 	if (empty($user_context)) { $user_context = $_SESSION['domain_name']; }

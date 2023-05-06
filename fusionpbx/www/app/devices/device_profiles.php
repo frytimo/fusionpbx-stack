@@ -47,14 +47,14 @@
 
 //get posted data
 	if (is_array($_POST['profiles'])) {
-		$action = $_POST['action'];
-		$search = $_POST['search'];
-		$profiles = $_POST['profiles'];
+		$action = $_POST['action'] ?? '';
+		$search = $_POST['search'] ?? '';
+		$profiles = $_POST['profiles'] ?? '';
 	}
 
 //get the search
-	$search = strtolower($_REQUEST["search"]);
-	$fields = strtolower($_REQUEST["fields"]);
+	$search = strtolower($_REQUEST["search"] ?? '');
+	$fields = strtolower($_REQUEST["fields"] ?? '');
 
 //process the http post data by action
 	if ($action != '' && is_array($profiles) && @sizeof($profiles) != 0) {

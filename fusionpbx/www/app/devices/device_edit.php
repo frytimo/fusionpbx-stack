@@ -541,8 +541,8 @@
 		
 		//if the vendor was not found using the mac address use an alternative method
 		if (empty($device_vendor)) {
-			$template_array = explode("/", $device_template);
-			$device_vendor = $template_array[0];
+			$template_array = explode("/", "" . $device_template);
+			$device_vendor = $template_array[0] ?? '';
 		}
 	}
 
@@ -908,7 +908,7 @@
 				'id'=>'btn_copy',
 				'style'=>'float: right; margin-left: 15px;',
 				'collapse'=>'never',
-				'onclick'=>"modal_close(); if (document.getElementById('new_mac_address').value != '') { window.location='device_copy.php?id=".urlencode($device_uuid)."&mac=' + document.getElementById('new_mac_address').value; }"
+				'onclick'=>"modal_close(); if (document.getElementById('new_mac_address').value != '') { window.location='device_copy.php?id=".urlencode($device_uuid ?? '')."&mac=' + document.getElementById('new_mac_address').value; }"
 				]),
 			'onclose'=>"document.getElementById('new_mac_address').value = '';",
 			]);
@@ -1590,7 +1590,7 @@
 						echo "	<optgroup label='".ucwords($function['vendor_name'])."'>\n";
 					}
 					$selected = '';
-					if (strtolower($row['device_key_vendor']) == $function['vendor_name'] && $row['device_key_type'] == $function['value']) {
+					if (strtolower($row['device_key_vendor'] ?? '') == $function['vendor_name'] && $row['device_key_type'] == $function['value']) {
 						$selected = "selected='selected'";
 					}
 					if (empty($row['device_key_vendor'])) {

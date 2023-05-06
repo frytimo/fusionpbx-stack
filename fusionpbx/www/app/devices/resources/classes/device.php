@@ -59,7 +59,7 @@
 
 		public static function get_vendor($mac){
 			//use the mac address to find the vendor
-				$mac = preg_replace('#[^a-fA-F0-9./]#', '', $mac);
+				$mac = preg_replace('#[^a-fA-F0-9./]#', '', "" . $mac);
 				$mac = strtolower($mac);
 				switch (substr($mac, 0, 6)) {
 				case "00085d":

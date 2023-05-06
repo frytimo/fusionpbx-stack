@@ -288,7 +288,7 @@
 	$order = $_GET["order"];
 
 //add the search term
-	$search = strtolower($_GET["search"]);
+	$search = strtolower($_GET["search"] ?? '');
 	if (!empty($search)) {
 		$sql_search = "and (";
 		$sql_search .= "lower(recording_name) like :search ";

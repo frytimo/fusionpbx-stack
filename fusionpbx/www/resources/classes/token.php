@@ -91,7 +91,7 @@ class token {
 			}
 
 		//limit the value to specific characters
-			$value = preg_replace('[^a-zA-Z0-9]', '', $value);
+			$value = preg_replace('[^a-zA-Z0-9]', '', '' .$value);
 
 		//compare the hashed tokens
 			if (is_array($_SESSION['tokens'][$key]) && @sizeof($_SESSION['tokens'][$key]) != 0) {

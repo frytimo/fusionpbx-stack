@@ -76,7 +76,7 @@
 
 //copy the csv file
 	//$_POST['submit'] == "Upload" &&
-	if ( is_uploaded_file($_FILES['ulfile']['tmp_name']) && permission_exists('device_import')) {
+	if ( is_uploaded_file($_FILES['ulfile']['tmp_name'] ?? '') && permission_exists('device_import')) {
 		if ($_POST['type'] == 'csv') {
 			$file = $_SESSION['server']['temp']['dir']."/devices-".$_SESSION['domain_name'].".csv";
 			if (move_uploaded_file($_FILES['ulfile']['tmp_name'], $file)) {
@@ -239,7 +239,7 @@
 	}
 
 //upload the csv
-	if (file_exists($_SESSION['file']) && $action == 'import') {
+	if (file_exists($_SESSION['file'] ?? '') && $action == 'import') {
 
 		//validate the token
 			$token = new token;

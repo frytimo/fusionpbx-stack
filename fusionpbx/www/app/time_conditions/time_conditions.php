@@ -85,7 +85,7 @@
 	$order = $_GET["order"];
 
 //add the search string
-	$search = strtolower($_GET["search"]);
+	$search = strtolower($_GET["search"] ?? '');
 	if (!empty($search)) {
 		$sql_search = "and (";
 		$sql_search .= " 	lower(dialplan_context) like :search ";

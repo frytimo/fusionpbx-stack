@@ -317,7 +317,7 @@
 	}
 
 //remove the spaces
-	$voicemail_mail_to = str_replace(" ", "", $voicemail_mail_to);
+	$voicemail_mail_to = str_replace(" ", "", "" . $voicemail_mail_to);
 
 //set the defaults
 	if (empty($voicemail_local_after_email)) { $voicemail_local_after_email = 'true'; }
@@ -598,7 +598,7 @@
 			echo "	</td>\n";
 			echo "	<td class='vtable' style='border-bottom: none;' align='left'>\n";
 			echo "		<select name='voicemail_options[".$c."][voicemail_option_order]' class='formfld' style='width:55px'>\n";
-			if (strlen(htmlspecialchars($voicemail_option_order))> 0) {
+			if (!empty(htmlspecialchars("" . $voicemail_option_order))) {
 				echo "		<option selected='yes' value='".htmlspecialchars($voicemail_option_order)."'>".htmlspecialchars($voicemail_option_order)."</option>\n";
 			}
 			$i = 0;

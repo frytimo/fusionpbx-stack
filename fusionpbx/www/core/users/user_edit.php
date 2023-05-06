@@ -1077,7 +1077,7 @@
 	}
 
 	//user time based one time password secret
-	if (in_array('totp', $_SESSION['authentication']['methods'])) {
+	if (in_array('totp', $_SESSION['authentication']['methods'] ?? [])) {
 		if ($user_totp_secret != '' && $username != '') {
 			$otpauth = "otpauth://totp/".$username."?secret=".$user_totp_secret."&issuer=".$_SESSION['domain_name'];
 
