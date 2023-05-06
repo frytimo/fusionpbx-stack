@@ -50,7 +50,7 @@
 	$order = $_GET["order"];
 
 //add the search term
-	$search = strtolower($_GET["search"]);
+	$search = strtolower($_GET["search"] ?? '');
 	if (!empty($search)) {
 		$sql_search = " (";
 		$sql_search .= "lower(queue_name) like :search ";
