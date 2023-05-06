@@ -277,7 +277,7 @@
 	echo "<br /><br />";
 	if (!empty($_SESSION["response"]) && is_array($_SESSION["response"])) {
 		foreach($_SESSION["response"] as $part => $response){
-			echo "<b>". $text["label-results"]." - ".$text["label-${part}"]."</b>";
+			echo "<b>". $text["label-results"]." - ".$text["label-{$part}"]."</b>";
 			echo "<br /><br />";
 			if (is_array($response)) {
 				echo "<pre>";

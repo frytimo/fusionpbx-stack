@@ -597,23 +597,12 @@ if (!class_exists('domains')) {
 				if (!$this->db) {
 					$database = new database;
 					$database->connect();
-					$this->db = $database->db;
 				}
 
 			//get the variables
 				$config = new config;
-				$config_exists = $config->exists();
 				$config_path = $config->find();
 				$config->get();
-				$db_type = $config->db_type;
-				$db_name = $config->db_name;
-				$db_username = $config->db_username;
-				$db_password = $config->db_password;
-				$db_secure = $config->db_secure;
-				$db_cert_authority = $config->db_cert_authority;
-				$db_host = $config->db_host;
-				$db_path = $config->db_path;
-				$db_port = $config->db_port;
 
 			//set the include path
 				$conf = array_merge(glob("/etc/fusionpbx/config.conf"), glob("/usr/local/etc/fusionpbx/config.conf"));
@@ -630,7 +619,6 @@ if (!class_exists('domains')) {
 				$config_list_2 = glob($_SERVER["DOCUMENT_ROOT"].PROJECT_PATH."/*/*/app_menu.php");
 				$config_list = array_merge((array)$config_list_1, (array)$config_list_2);
 				unset($config_list_1,$config_list_2);
-				$db = $this->db;
 				$x=0;
 				foreach ($config_list as &$config_path) {
 					$app_path = dirname($config_path);
@@ -667,7 +655,7 @@ if (!class_exists('domains')) {
 							$_SESSION["domain_name"] = $row['domain_name'];
 						}
 						else {
-							if (lower_case($row['domain_name']) == lower_case($domain_array[0]) || lower_case($row['domain_name']) == lower_case('www.'.$domain_array[0])) {
+							if (lower_case($row['domain_name']) == lower_case($domain_array[0] ?? '') || lower_case($row['domain_name']) == lower_case('www.'.$domain_array[0])) {
 								$_SESSION["domain_uuid"] = $row["domain_uuid"];
 								$_SESSION["domain_name"] = $row['domain_name'];
 							}
@@ -678,16 +666,11 @@ if (!class_exists('domains')) {
 				}
 
 			//loop through all domains
-				$domain_count = count($domains);
 				$domains_processed = 1;
 				foreach ($domains as &$row) {
 					//get the values from database and set them as php variables
 						$domain_uuid = $row["domain_uuid"];
-						$domain_name = $row["domain_name"];
-
-					//get the context
-						$context = $domain_name;
-
+				
 					//get the default settings - this needs to be done to reset the session values back to the defaults for each domain in the loop
 						foreach($database_default_settings as $row) {
 							$name = $row['default_setting_name'];
@@ -750,7 +733,7 @@ if (!class_exists('domains')) {
 		 * update the uuid for older default settings that were added before the uuids was predefined.
 		 */
 		public function settings() {
-
+			global $apps;
 			//includes files
 				include "resources/require.php";
 
@@ -771,6 +754,7 @@ if (!class_exists('domains')) {
 					$x++;
 				}
 				$x = 0;
+				$array = [];
 				foreach ($apps as $app) {
 					if (is_array($app['default_settings'])) {
 						foreach ($app['default_settings'] as $row) {
@@ -784,7 +768,7 @@ if (!class_exists('domains')) {
 				}
 
 			//add the missing default settings
-				if (is_array($array) && count($array) > 0) {
+				if (count($array) > 0) {
 					//grant temporary permissions
 						$p = new permissions;
 						$p->add('default_setting_add', 'temp');
