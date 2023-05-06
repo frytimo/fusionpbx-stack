@@ -57,18 +57,18 @@
 
 //get http post variables and set them to php variables
 	if (count($_REQUEST) > 0) {
-		$default_setting_category = strtolower($_REQUEST["default_setting_category"]);
-		$default_setting_subcategory = strtolower($_POST["default_setting_subcategory"]);
-		$default_setting_name = strtolower($_POST["default_setting_name"]);
-		$default_setting_value = $_POST["default_setting_value"];
-		$default_setting_order = $_POST["default_setting_order"];
+		$default_setting_category = strtolower($_REQUEST["default_setting_category"] ?? '');
+		$default_setting_subcategory = strtolower($_POST["default_setting_subcategory"] ?? '');
+		$default_setting_name = strtolower($_POST["default_setting_name"] ?? '');
+		$default_setting_value = $_POST["default_setting_value"] ?? '';
+		$default_setting_order = $_POST["default_setting_order"] ?? '';
 		$default_setting_enabled = $_POST["default_setting_enabled"] ?: 'false';
-		$default_setting_description = $_POST["default_setting_description"];
+		$default_setting_description = $_POST["default_setting_description"] ?? '';
 	}
 
 //sanitize the variables
-	$search = preg_replace('#[^a-zA-Z0-9_\-\. ]#', '', $search);
-	$default_setting_category = preg_replace('#[^a-zA-Z0-9_\-\.]#', '', $default_setting_category);
+	$search = preg_replace('#[^a-zA-Z0-9_\-\. ]#', '', "" . $search);
+	$default_setting_category = preg_replace('#[^a-zA-Z0-9_\-\.]#', '', "" .$default_setting_category);
 
 //build the query string
 	$query_string = '';
