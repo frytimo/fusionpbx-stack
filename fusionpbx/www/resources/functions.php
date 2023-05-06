@@ -150,7 +150,7 @@
 	}
 
 	if (!function_exists('is_uuid')) {
-		function is_uuid(mixed $uuid) {
+		function is_uuid($uuid) {
 			if (is_string($uuid) || (is_object($uuid) && method_exists($uuid, '__toString'))) {
 				$regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i';
 				return preg_match($regex, $uuid);
