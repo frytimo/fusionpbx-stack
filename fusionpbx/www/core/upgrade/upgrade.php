@@ -34,7 +34,7 @@
 	else {
 		//include the config.php
 		$config_php_glob = array_merge(glob("/etc/fusionpbx/config.php"), glob("/usr/local/etc/fusionpbx/config.php"));
-		include($config_php_glob[0]);
+		include($config_php_glob[0] ?? '');
 
 		//set the default config file location
 		if (stristr(PHP_OS, 'BSD')) {

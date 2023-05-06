@@ -70,7 +70,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./fusionpbx/www:/var/www/fusionpbx
-      - ./fusionpbx/etc/:/etc/fusionpbx
+      - ./fusionpbx/etc/:/etc/fusionpbx:ro
       - ./fusionpbx/upgrade_apps/init_database.php:/var/www/fusionpbx/core/upgrade/init_database.php
       - ./fusionpbx/upgrade_apps/upgrade_menu.php:/var/www/fusionpbx/core/upgrade/upgrade_menu.php
       - ./fusionpbx/extra_apps:/usr/local/src/extra_apps
@@ -115,3 +115,4 @@ services:
       - 443:443
 volumes:
   fpbx-db:
+    name: fpbx-db-${POSTGRES_VERSION}

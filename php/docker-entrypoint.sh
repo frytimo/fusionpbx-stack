@@ -19,13 +19,13 @@ fi
 
 if [ ! -d /etc/fusionpbx ]; then
     mkdir -p /etc/fusionpbx
+    chown -R fusionpbx:fusionpbx /etc/fusionpbx
 fi
 
 if [ ! -d /dev/shm/freeswitch ]; then
     mkdir -p /dev/shm/freeswitch
 fi
 
-chown -R fusionpbx:fusionpbx /etc/fusionpbx
 chown fusionpbx:fusionpbx /dev/shm/freeswitch
 
 # Source docker-entrypoint.sh:
