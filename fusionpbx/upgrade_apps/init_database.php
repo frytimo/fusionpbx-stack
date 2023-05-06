@@ -41,13 +41,17 @@
 	require BASE_DIR .'/resources/functions.php';
 
 	function connect() {
-		//test for v_domains to exist
-		try {
-			$con = new \PDO('pgsql:host=db;port=5432;dbname=fusionpbx', 'fusionpbx','fusionpbx');
-		} catch (Exception $ex) {
-			die($ex->getMessage());
+		$tries = 0;
+		while($tries++ < 10) {
+			//test for v_domains to exist
+			try {
+				$con = new \PDO('pgsql:host=db;port=5432;dbname=fusionpbx', 'fusionpbx','fusionpbx');
+				return $con;
+			} catch (Exception $ex) {
+				sleep(1);
+			}
 		}
-		return $con;
+		die('Unable to connect after 10 tries');
 	}
 
 	function has_table($con, $table_name, $schema = "public") {
