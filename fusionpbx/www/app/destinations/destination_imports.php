@@ -84,7 +84,7 @@
 
 //copy the csv file
 	//$_POST['submit'] == "Upload" &&
-	if (is_uploaded_file($_FILES['ulfile']['tmp_name']) && permission_exists('destination_upload')) {
+	if (is_uploaded_file($_FILES['ulfile']['tmp_name'] ?? '') && permission_exists('destination_upload')) {
 		if ($_POST['type'] == 'csv') {
 			move_uploaded_file($_FILES['ulfile']['tmp_name'], $_SESSION['server']['temp']['dir'].'/'.$_FILES['ulfile']['name']);
 			$save_msg = "Uploaded file to ".$_SESSION['server']['temp']['dir']."/". htmlentities($_FILES['ulfile']['name']);
@@ -148,7 +148,7 @@
 	}
 
 //upload the destination csv
-	if (file_exists($_SESSION['file']) && $action == 'add') {
+	if (file_exists($_SESSION['file'] ?? '') && $action == 'add') {
 
 		//validate the token
 			$token = new token;
@@ -491,7 +491,7 @@
 	}
 
 //upload the destination csv
-	if (file_exists($_SESSION['file']) && $action == 'delete') {
+	if (file_exists($_SESSION['file'] ?? '') && $action == 'delete') {
 
 		//validate the token
 			$token = new token;
