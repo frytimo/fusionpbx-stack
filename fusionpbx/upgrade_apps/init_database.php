@@ -32,10 +32,30 @@
 	 * This is designed to make an empty postgresql fusionpbx database usuable with core/upgrade/upgrade.php
 	 */
 
-	$domain_name = 'localhost';
-	define('BASE_DIR','/var/www/fusionpbx');
+	// read the environment file from /etc/fusionpbx/config.conf
+	$conf = glob("/etc/fusionpbx/config.conf");
+	$settings = parse_ini_file($conf[0]);
+
+	// database connection and type (dsn)
+	define('DB_TYPE', $settings['database.0.type']);
+	define('DB_HOST', $settings['database.0.host']);
+	define('DB_PORT', $settings['database.0.port']);
+	define('DB_NAME', $settings['database.0.name']);
+	define('DB_USERNAME', $settings['database.0.username']);
+	define('DB_PASSWORD', $settings['database.0.password']);
+
+	// initial settings to use for admin login and password
+	define('DOMAIN_NAME',    $settings['init.domain.name']);
+	define('ADMIN_NAME',     $settings['init.admin.name']);
+	define('ADMIN_PASSWORD', $settings['init.admin.password']);
+	
+	// directory structure
+	define('BASE_DIR',$settings['document.root']);
 	define('CORE_DIR',BASE_DIR . '/core');
 	define('APP_DIR' ,BASE_DIR . '/app');
+
+	//set include path
+	set_include_path(BASE_DIR);
 
 	//load the uuid function
 	require BASE_DIR .'/resources/functions.php';
@@ -45,7 +65,7 @@
 		while($tries++ < 10) {
 			//test for v_domains to exist
 			try {
-				$con = new \PDO('pgsql:host=db;port=5432;dbname=fusionpbx', 'fusionpbx','fusionpbx');
+				$con = new \PDO(DB_TYPE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_NAME, DB_USERNAME, DB_PASSWORD);
 				return $con;
 			} catch (Exception $ex) {
 				sleep(1);
@@ -54,6 +74,7 @@
 		die('Unable to connect after 10 tries');
 	}
 
+	// checks for a table to exist or not assuming this is a postgres connection
 	function has_table($con, $table_name, $schema = "public") {
 		$statement = $con->prepare("SELECT COUNT(*)"
 			. " FROM information_schema.tables"
@@ -70,6 +91,13 @@
 		return false;
 	}
 
+	/**
+	 * Execute a statement and return a value if fetch_type is set
+	 * @param type $con
+	 * @param type $sql
+	 * @param int|null $fetch_type
+	 * @return bool
+	 */
 	function db_execute($con, $sql, ?int $fetch_type = null) {
 		$statement = $con->prepare($sql);
 		$result = $statement->execute();
@@ -82,6 +110,12 @@
 		return false;
 	}
 
+	/**
+	 * Read a schema array from an existing FusionPBX app_config style file
+	 * @param type $path full directory path
+	 * @param type $file if not provided default is app_config.php
+	 * @return type
+	 */
 	function get_schema_from_app_config($path, $file = 'app_config.php') {
 		$x = 0;
 		$config = $path . '/' . $file;
@@ -95,6 +129,11 @@
 		return null;
 	}
 
+	/**
+	 * Writes a FusionPBX app_config.php style schema array to the database
+	 * @param type $con PDO connection
+	 * @param type $schema FusionPBX app_config.php style schema array
+	 */
 	function write_schema($con, $schema) {
 		if(empty($schema))
 			return;
@@ -140,11 +179,24 @@
 		}
 	}
 
+	/**
+	 * Reads a default_setting_value for a switch setting from the database
+	 * @param type $con	PDO connection
+	 * @param type $subcategory switch setting
+	 * @return type
+	 */
 	function get_switch_setting($con, $subcategory) {
 		return db_execute($con, "select default_setting_value from v_default_settings"
 		. " where default_setting_category='switch' and default_setting_subcategory='$subcategory'", 7);
 	}
 
+	/**
+	 * Writes a default_setting_value for a switch setting to the database
+	 * @param type $con PDO connection
+	 * @param string $uuid must be a valid UUID type
+	 * @param string $subcategory switch setting
+	 * @param string $value value to store in database
+	 */
 	function put_switch_setting($con, $uuid, $subcategory, $value) {
 		db_execute($con, "insert into v_default_settings("
 			. "default_setting_uuid"
@@ -182,11 +234,11 @@
 			. ",domain_enabled"
 			. ") values ("
 			. "'" . uuid() . "'"
-			. ",'$domain_name'"
+			. ",'". DOMAIN_NAME . "'"
 			. ",true"
 			. ")");
 	}
-	$domain_uuid = db_execute($con, "select domain_uuid from v_domains where domain_name='$domain_name'", 7);
+	$domain_uuid = db_execute($con, "select domain_uuid from v_domains where domain_name='" . DOMAIN_NAME . "'", 7);
 
 	if(empty($domain_uuid)) {
 		$domain_uuid = uuid();
@@ -204,8 +256,8 @@
 			. ") values ("
 			. "'" . uuid() . "'"
 			. ",'$domain_uuid'"
-			. ",'admin'"
-			. ",'" . password_hash('password', PASSWORD_BCRYPT) . "'"
+			. ",'" . ADMIN_NAME . "'"
+			. ",'" . password_hash(ADMIN_PASSWORD, PASSWORD_BCRYPT) . "'"
 			. ",'true'"
 			. ")");
 	}
