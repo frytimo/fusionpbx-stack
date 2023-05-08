@@ -280,8 +280,8 @@
 	unset ($sql, $parameters);
 
 //set the assigned_groups array
+	$assigned_groups = array();
 	if (is_array($dashboard_groups) && sizeof($dashboard_groups) != 0) {
-		$assigned_groups = array();
 		foreach ($dashboard_groups as $field) {
 			if (!empty($field['group_name'])) {
 				if (is_uuid($field['group_uuid'])) {
