@@ -71,7 +71,7 @@ services:
     environment:
       XDEBUG_CONFIG: "mode=development,debug client_host=host.docker.internal idekey=${IDEKEY}"
     volumes:
-      - ./fusionpbx/www:/var/www/fusionpbx
+      - ./fusionpbx/fusionpbx:/var/www/fusionpbx
       - ./fusionpbx/etc/:/etc/fusionpbx:ro
       - ./fusionpbx/upgrade_apps/init_database.php:/var/www/fusionpbx/core/upgrade/init_database.php
       - ./fusionpbx/upgrade_apps/upgrade_menu.php:/var/www/fusionpbx/core/upgrade/upgrade_menu.php
@@ -104,7 +104,7 @@ services:
       - fs
       - php
     volumes:
-      - ./fusionpbx/www:/var/www/fusionpbx
+      - ./fusionpbx/fusionpbx:/var/www/fusionpbx
       - ./fusionpbx/www/resources/templates/conf:/etc/freeswitch
       - ./nginx/config:/etc/nginx
       - ./php/socket:/var/run/php
