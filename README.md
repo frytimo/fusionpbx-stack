@@ -2,7 +2,7 @@
 <p>clone with</p>
 
 ```
-git clone https://github.com/frytimo/fusionpbx-stack.git
+git clone --recursive https://github.com/frytimo/fusionpbx-stack.git
 ```
 
 <p>then create a .env file or copy the example</p>
