@@ -105,7 +105,6 @@ services:
       - php
     volumes:
       - ./fusionpbx/fusionpbx:/var/www/fusionpbx
-      - ./fusionpbx/www/resources/templates/conf:/etc/freeswitch
       - ./nginx/config:/etc/nginx
       - ./php/socket:/var/run/php
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
