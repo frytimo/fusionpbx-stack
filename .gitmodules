@@ -1,0 +1,3 @@
+[submodule "fusionpbx/fusionpbx"]
+	path = fusionpbx/fusionpbx
+	url = https://github.com/fusionpbx/fusionpbx
