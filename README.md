@@ -29,5 +29,3 @@ cd fusionpbx-stack/freeswitch/build && git clone https://github.com/signalwire/f
 ```
 docker-compose up
 ```
-
-
