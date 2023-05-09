@@ -5,7 +5,7 @@ FROM php:${PHP_VERSION}
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 # These are some packages that contain commands FusionPBX runs in a shell
-RUN if [ -z $(which apk) ]; then DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt install -y procps uptimed lsb-release; else apk update && apk add procps uptimed; fi
+RUN if [ -z $(which apk) ]; then DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt install -y procps uptimed lsb-release wget; else apk update && apk add wget procps uptimed; fi
 
 ARG XDEBUG_VERSION=3.2.1
 # Install Postgres extension
