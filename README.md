@@ -2,7 +2,7 @@
 <p>clone with</p>
 
 ```
-git clone --recursive https://github.com/frytimo/fusionpbx-stack.git
+git clone https://github.com/frytimo/fusionpbx-stack.git
 ```
 
 <p>then create a .env file or copy the example</p>
@@ -18,10 +18,10 @@ cp fusionpbx-stack/fusionpbx/etc/config.conf.example fusionpbx-stack/fusionpbx/e
 ```
 
 
-<p>Clone the repos for freeswitch, spandsp, sofia-sip using:</p>
+<p>Clone the repos for freeswitch, spandsp, sofia-sip, and fusionpbx using:</p>
 
 ```
-cd fusionpbx-stack/freeswitch/build && git clone https://github.com/signalwire/freeswitch && git clone https://github.com/freeswitch/spandsp && git clone https://github.com/freeswitch/sofia-sip && cd ../..
+cd fusionpbx-stack/freeswitch/build && git clone https://github.com/signalwire/freeswitch && git clone https://github.com/freeswitch/spandsp && git clone https://github.com/freeswitch/sofia-sip && cd ../.. && cd fusionpbx && git clone https://github.com/fusionpbx/fusionpbx && cd ..
 ```
 
 <p>Now execute the stack</p>
