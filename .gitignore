@@ -8,6 +8,8 @@ nbproject/
 freeswitch/build/sounds/
 freeswitch/sounds/
 freeswitch/db/*
+freeswitch/autoload_configs/modules.conf.xml
+freeswitch/conf/vars.xml
 fusionpbx/cache/*
 fusionpbx/etc/config.conf
 fusionpbx/fusionpbx/
