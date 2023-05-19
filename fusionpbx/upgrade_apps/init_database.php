@@ -190,6 +190,12 @@
 		. " where default_setting_category='switch' and default_setting_subcategory='$subcategory'", 7);
 	}
 
+	function enable_switch_setting($con, $uuid) {
+		db_execute($con, "update v_default_settings"
+			. " set default_setting_enabled = true"
+			. " where default_setting_uuid = '$uuid'");
+	}
+
 	/**
 	 * Writes a default_setting_value for a switch setting to the database
 	 * @param type $con PDO connection
@@ -346,6 +352,16 @@
 	if(empty(get_switch_setting($con, 'voicemail')))
 		put_switch_setting($con, 'ba3ac900-245c-4cff-a191-829137db47d8' ,'voicemail', '/var/lib/freeswitch/storage/voicemail');
 
+	if(empty(get_switch_setting($con, 'extensions')))
+		put_switch_setting($con, '04e0ea1c-dc2c-4377-bee9-39adb61f2c66', 'extensions', '/etc/freeswitch/directory');
+
+	//ensure localhost directory exists
+	if(!file_exists('/etc/freeswitch/directory'))
+		mkdir ('/etc/freeswitch/directory');
+	if(!file_exists('/etc/freeswitch/directory/localhost'))
+		mkdir ('/etc/freeswitch/directory/localhost');
+
+
 	// make sure the v_settings table exists
 	if(!has_table($con, 'v_settings')) {
 		echo "Creating v_settings\n";
@@ -383,6 +399,9 @@
 	} elseif ($socket_ip !== 'fs') {
 		db_execute($con, "update v_settings set event_socket_ip_address = 'fs' where setting_uuid = 'ce1b1936-fc61-4e8c-84cf-252a510a74fd'");
 	}
+
+	//turn on the extension dir setting in defaults
+	
 
 	//now run the core upgrade twice
 
