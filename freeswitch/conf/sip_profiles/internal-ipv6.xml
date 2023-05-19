@@ -2,7 +2,7 @@
 	<!-- http://wiki.freeswitch.org/wiki/Sofia_Configuration_Files -->
 	<settings>
 		<param name="user-agent-string" value="FreeSWITCH"/>
-		<param name="debug" value=""/>
+		<param name="debug" value="0"/>
 		<param name="sip-trace" value="no"/>
 		<param name="context" value="public"/>
 		<param name="rfc2833-pt" value="101"/>
@@ -20,7 +20,7 @@
 		<param name="dtmf-type" value="rfc2833"/>
 		<param name="record-template" value="$${recordings_dir}/${caller_id_number}.${strftime(%Y-%m-%d-%H-%M-%S)}.${record_ext}"/>
 		<param name="manage-presence" value="true"/>
-		<param name="session-timeout" value=""/>
+		<param name="session-timeout" value="0"/>
 		<param name="enable-timer" value="false"/>
 		<param name="inbound-codec-negotiation" value="generous"/>
 		<param name="tls" value="$${internal_ssl_enable}"/>

@@ -22,7 +22,7 @@
 
 	<settings>
 		<param name="user-agent-string" value="FreeSWITCH"/>
-		<param name="debug" value=""/>
+		<param name="debug" value="0"/>
 		<param name="sip-trace" value="no"/>
 		<param name="sip-capture" value="no"/>
 		<param name="watchdog-enabled" value="no"/>
