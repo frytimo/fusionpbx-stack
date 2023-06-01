@@ -26,15 +26,12 @@
   Tim Fry <tim@voipstratus.com>
  */
 
-
-
 	/*
 	 * This is designed to make an empty postgresql fusionpbx database usuable with core/upgrade/upgrade.php
 	 */
 
 	// read the environment file from /etc/fusionpbx/config.conf
-	$conf = glob("/etc/fusionpbx/config.conf");
-	$settings = parse_ini_file($conf[0]);
+	$settings = parse_ini_file('/etc/fusionpbx/config.conf');
 
 	// database connection and type (dsn)
 	define('DB_TYPE', $settings['database.0.type']);
@@ -99,13 +96,24 @@
 	 * @return bool
 	 */
 	function db_execute($con, $sql, ?int $fetch_type = null) {
+		//allow sql commands to fail without crashing
+		$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		//prepare the sql statement
 		$statement = $con->prepare($sql);
+		//execute the statement
 		$result = $statement->execute();
 		if($result !== false) {
 			if($fetch_type === null)
 				return;
 			else
-				return $statement->fetch($fetch_type);
+				switch($fetch_type) {
+					case PDO::FETCH_COLUMN:
+						return $statement->fetchColumn();
+					case PDO::FETCH_ASSOC:
+						return $statement->fetchAll(PDO::FETCH_ASSOC);
+					default:
+						return $statement->fetch($fetch_type);
+				}
 		}
 		return false;
 	}
@@ -223,6 +231,157 @@
 	}
 
 
+	function make_directory($directory) {
+		if(!file_exists($directory))
+			mkdir($directory);
+	}
+
+	// checks for the dsn pre-process connector in the database
+	function dsn_exists($con) {
+		return ((int)db_execute($con, "select count(var_uuid) from v_vars where var_category='DSN' and var_name='db_dsn' and var_enabled='true'", PDO::FETCH_COLUMN) > 0);
+	}
+
+	function rewrite_event_socket_config() {
+//		$xml_object = simplexml_load_file('/etc/freeswitch/autoload_configs/event_socket.conf.xml');
+//		$json = json_encode($xml_object);
+//		$conf_array = json_decode($json, true);
+//
+//		$found = false;
+//		$inbound_acl_exists = false;
+//		$sb = '<configuration name="event_socket.conf" description="Socket Client">' . "\n";
+//		$sb .= '	<settings>'."\n";
+//		foreach($conf_array['settings']['param'] as &$param) {
+//			$sb .= "		<param";
+//			foreach($param as &$attributes) {
+//				foreach($attributes as $key => &$value) {
+//					if($found) {
+//						$value = '0.0.0.0';
+//					}
+//					$found = ($value === 'listen-ip');
+//					if($value === 'apply-inbound-acl') {
+//						$inbound_acl_exists = true;
+//					}
+//					$sb .= " $key=\"$value\"";
+//				}
+//			}
+//			$sb .= " />\n";
+//		}
+//		if(!$inbound_acl_exists) {
+//			$sb .= '		<param name="apply-inbound-acl" value="any_v4.auto" />' . "\n";
+//		}
+//		$sb .= '	</settings>'."\n";
+//		$sb .= '</configuration>';
+//		$fhandle = fopen('/etc/freeswitch/autoload_configs/event_socket.conf.xml', 'w');
+//		fwrite($fhandle, $sb);
+//		fclose($fhandle);
+
+		$data = <<<EOF
+<configuration name="event_socket.conf" description="Socket Client">
+        <settings>
+                <param name="nat-map" value="false" />
+                <param name="listen-ip" value="0.0.0.0" />
+                <param name="listen-port" value="8021" />
+                <param name="password" value="ClueCon" />
+                <param name="apply-inbound-acl" value="any_v4.auto" />
+        </settings>
+</configuration>
+EOF;
+
+		//always replace contents
+		file_put_contents('/etc/freeswitch/autoload_configs/event_socket.conf.xml', $data);
+	}
+
+	function rewrite_modules_conf() {
+		$data = <<<EOF
+<configuration name="modules.conf" description="Modules">
+        <modules>
+
+                <!-- Applications -->
+                <load module="mod_commands"/>
+                <load module="mod_memcache"/>
+
+                <!-- Languages -->
+                <load module="mod_lua"/>
+
+                <!-- Endpoints -->
+                <load module="mod_sofia"/>
+
+                <!-- Loggers -->
+                <load module="mod_logfile"/>
+                <load module="mod_console"/>
+
+                <!-- Applications -->
+                <load module="mod_callcenter"/>
+                <load module="mod_fifo"/>
+                <load module="mod_sms"/>
+                <load module="mod_fsv"/>
+                <load module="mod_esf"/>
+                <load module="mod_expr"/>
+                <load module="mod_dptools"/>
+                <load module="mod_enum"/>
+                <load module="mod_valet_parking"/>
+                <load module="mod_spandsp"/>
+                <load module="mod_db"/>
+                <load module="mod_hash"/>
+                <load module="mod_conference"/>
+
+                <!-- Auto -->
+
+                <!-- Codecs -->
+                <load module="mod_g729"/>
+                <load module="mod_g723_1"/>
+                <load module="mod_bv"/>
+                <load module="mod_amr"/>
+                <load module="mod_h26x"/>
+
+                <!-- Dialplan Interfaces -->
+                <load module="mod_dialplan_xml"/>
+
+                <!-- Endpoints -->
+                <load module="mod_loopback"/>
+
+                <!-- Event Handlers -->
+                <load module="mod_event_socket"/>
+
+                <!-- File Format Interfaces -->
+                <load module="mod_sndfile"/>
+                <load module="mod_native_file"/>
+
+                <!-- Say -->
+                <load module="mod_say_en"/>
+                <load module="mod_say_zh"/>
+                <load module="mod_say_ru"/>
+                <load module="mod_say_fr"/>
+                <load module="mod_say_th"/>
+                <load module="mod_say_he"/>
+                <load module="mod_say_pt"/>
+                <load module="mod_say_de"/>
+                <load module="mod_say_it"/>
+                <load module="mod_say_nl"/>
+                <load module="mod_say_es"/>
+                <load module="mod_say_hu"/>
+
+                <!-- Speech Recognition / Text to Speech -->
+                <load module="mod_flite"/>
+                <load module="mod_tts_commandline"/>
+
+                <!-- Streams / Files -->
+                <load module="mod_local_stream"/>
+                <load module="mod_tone_stream"/>
+                <load module="mod_shout"/>
+
+                <!-- XML Interfaces -->
+                <load module="mod_xml_cdr"/>
+
+        </modules>
+</configuration>
+EOF;
+		//if(!file_exists('/etc/freeswitch/autoload_configs/.modules_copied')) {
+			file_put_contents('/etc/freeswitch/autoload_configs/modules.conf.xml', $data);
+		//	shell_exec('touch /etc/freeswitch/autoload_configs/.modules_copied');
+		//}
+	}
+
 	//startup
 	echo "+-----------------+\n";
 	echo "|+---------------+|\n";
@@ -230,6 +389,18 @@
 	echo "|+---------------+|\n";
 	echo "+-----------------+\n";
 
+	//give extra time for freeswitch to be running
+	sleep(10);
+
+	//rewrite the event_socket_configuration
+	rewrite_event_socket_config();
+
+	//override session event_socket variables
+	$_SESSION['event_socket_ip_address'] = 'fs';
+	$_SESSION['event_socket_port'] = '8021';
+	$_SESSION['event_socket_password'] = 'ClueCon';
+
+	//connect to database and check needed values
 	$con = connect();
 	if(!has_table($con, 'v_domains')) {
 		echo "Creating v_domains\n";
@@ -355,12 +526,18 @@
 	if(empty(get_switch_setting($con, 'extensions')))
 		put_switch_setting($con, '04e0ea1c-dc2c-4377-bee9-39adb61f2c66', 'extensions', '/etc/freeswitch/directory');
 
-	//ensure localhost directory exists
-	if(!file_exists('/etc/freeswitch/directory'))
-		mkdir ('/etc/freeswitch/directory');
-	if(!file_exists('/etc/freeswitch/directory/localhost'))
-		mkdir ('/etc/freeswitch/directory/localhost');
+	$new_install = false;
+	//move the fusionpbx version of the config to the freeswitch config
+	if(!file_exists('/etc/freeswitch/.copied')) {
+		$new_install = true;
+		//move fusionpbx template files in
+		shell_exec('rm -Rf /etc/freeswitch/*');
+		shell_exec('cp -R /var/www/fusionpbx/resources/templates/conf/* /etc/freeswitch');
+		shell_exec('touch /etc/freeswitch/.copied');
+	}
 
+	//rewrite the event_socket_configuration
+	rewrite_event_socket_config();
 
 	// make sure the v_settings table exists
 	if(!has_table($con, 'v_settings')) {
@@ -400,10 +577,48 @@
 		db_execute($con, "update v_settings set event_socket_ip_address = 'fs' where setting_uuid = 'ce1b1936-fc61-4e8c-84cf-252a510a74fd'");
 	}
 
-	//turn on the extension dir setting in defaults
+	//ensure the sip profile directories are present
+	make_directory('/etc/freeswitch/sip_profiles');
+	make_directory('/etc/freeswitch/sip_profiles/internal');
+	make_directory('/etc/freeswitch/sip_profiles/external');
 	
+//	//now run the core upgrade twice
+//
+//	try {
+//		// consume the output
+//		ob_start();
+//		include CORE_DIR . '/upgrade/upgrade.php';
+//		ob_end_clean();
+//	} catch (\Throwable $t) {
+//
+//	}
 
-	//now run the core upgrade twice
+	// inject the DSN in to the database
+	if(!dsn_exists($con)) {
+		echo "\n\n";
+		echo "+----------------------------------------+\n";
+		echo "| CREATING DSN CONNECTOR FOR FreeSWITCH. |\n";
+		echo "|    FreeSWITCH MUST BE RESTARTED!       |\n";
+		echo "+----------------------------------------+\n";
+		echo "\n\n";
+		$db_dsn = DB_TYPE."://hostaddr=".DB_HOST . " port=". DB_PORT . " dbname=".DB_NAME. " user=".DB_USERNAME. " password=".DB_PASSWORD;
+		db_execute($con, "insert into v_vars("
+			. "var_uuid"
+			. ",var_category"
+			. ",var_name"
+			. ",var_value"
+			. ",var_command"
+			. ",var_enabled"
+			. ",var_order) values ("
+			. "'" . uuid() . "'"
+			. ",'DSN'"
+			. ",'db_dsn'"
+			. ",'" . DB_TYPE."://hostaddr=".DB_HOST . " port=". DB_PORT . " dbname=".DB_NAME. " user=".DB_USERNAME. " password=".DB_PASSWORD. "'"
+			. ",'set'"
+			. ",'true'"
+			. ",0)"
+			);
+	}
 
 	try {
 		// consume the output
@@ -414,170 +629,32 @@
 
 	}
 
-	include CORE_DIR . '/upgrade/upgrade.php';
+	//wait a while for changes
+	sleep(10);
+	
+	//rewrite the event_socket_configuration
+	rewrite_event_socket_config();
+	rewrite_modules_conf();
 
-	//after upgrade.php executes it will wipe out the modules.conf.xml so put it back
-	$module_data = <<<EOF
-<configuration name="modules.conf" description="Modules">
-  <modules>
-    <!-- Loggers (I'd load these first) -->
-    <load module="mod_console"/>
-    <!-- <load module="mod_graylog2"/> -->
-    <load module="mod_logfile"/>
-    <!-- <load module="mod_syslog"/> -->
-
-    <!--<load module="mod_yaml"/>-->
-
-    <!-- Multi-Faceted -->
-    <!-- mod_enum is a dialplan interface, an application interface and an api command interface -->
-    <load module="mod_enum"/>
-
-    <!-- XML Interfaces -->
-    <!-- <load module="mod_xml_rpc"/> -->
-    <!-- <load module="mod_xml_curl"/> -->
-    <!-- <load module="mod_xml_cdr"/> -->
-    <!-- <load module="mod_xml_radius"/> -->
-    <!-- <load module="mod_xml_scgi"/> -->
-
-    <!-- Event Handlers -->
-    <!-- <load module="mod_amqp"/> -->
-    <load module="mod_cdr_csv"/>
-    <!-- <load module="mod_cdr_sqlite"/> -->
-    <!-- <load module="mod_event_multicast"/> -->
-    <load module="mod_event_socket"/>
-    <!-- <load module="mod_event_zmq"/> -->
-    <!-- <load module="mod_zeroconf"/> -->
-    <!-- <load module="mod_erlang_event"/> -->
-    <!-- <load module="mod_smpp"/> -->
-    <!-- <load module="mod_snmp"/> -->
-
-    <!-- Directory Interfaces -->
-    <!-- <load module="mod_ldap"/> -->
-
-    <!-- Endpoints -->
-    <!-- <load module="mod_dingaling"/> -->
-    <!-- <load module="mod_portaudio"/> -->
-    <!-- <load module="mod_alsa"/> -->
-    <load module="mod_sofia"/>
-    <load module="mod_loopback"/>
-    <!-- <load module="mod_woomera"/> -->
-    <!-- <load module="mod_freetdm"/> -->
-    <!-- <load module="mod_unicall"/> -->
-    <!-- <load module="mod_skinny"/> -->
-    <!-- <load module="mod_khomp"/>   -->
-    <load module="mod_rtc"/>
-    <!-- <load module="mod_rtmp"/>   -->
-    <load module="mod_verto"/>
-
-    <!-- Applications -->
-    <load module="mod_signalwire"/>
-    <load module="mod_commands"/>
-    <load module="mod_conference"/>
-    <!-- <load module="mod_curl"/> -->
-    <load module="mod_db"/>
-    <load module="mod_dptools"/>
-    <load module="mod_expr"/>
-    <load module="mod_fifo"/>
-    <load module="mod_hash"/>
-    <!--<load module="mod_mongo"/> -->
-    <load module="mod_voicemail"/>
-    <!--<load module="mod_directory"/>-->
-    <!--<load module="mod_distributor"/>-->
-    <!--<load module="mod_lcr"/>-->
-    <!--<load module="mod_easyroute"/>-->
-    <load module="mod_esf"/>
-    <load module="mod_fsv"/>
-    <!--<load module="mod_cluechoo"/>-->
-    <load module="mod_valet_parking"/>
-    <!--<load module="mod_fsk"/>-->
-    <!--<load module="mod_spy"/>-->
-    <!--<load module="mod_sms"/>-->
-    <!--<load module="mod_sms_flowroute"/>-->
-    <!--<load module="mod_smpp"/>-->
-    <!--<load module="mod_random"/>-->
-    <load module="mod_httapi"/>
-    <!--<load module="mod_translate"/>-->
-
-    <!-- SNOM Module -->
-    <!--<load module="mod_snom"/>-->
-
-    <!-- This one only works on Linux for now -->
-    <!--<load module="mod_ladspa"/>-->
-
-    <!-- Dialplan Interfaces -->
-    <!-- <load module="mod_dialplan_directory"/> -->
-    <load module="mod_dialplan_xml"/>
-    <load module="mod_dialplan_asterisk"/>
-
-    <!-- Codec Interfaces -->
-    <load module="mod_spandsp"/>
-    <load module="mod_g723_1"/>
-    <load module="mod_g729"/>
-    <load module="mod_amr"/>
-    <!--<load module="mod_ilbc"/>-->
-    <!--<load module="mod_h26x"/>-->
-    <load module="mod_b64"/>
-    <!--<load module="mod_siren"/>-->
-    <!--<load module="mod_isac"/>-->
-    <load module="mod_opus"/>
-
-    <!-- File Format Interfaces -->
-    <load module="mod_av"/>
-    <load module="mod_sndfile"/>
-    <load module="mod_native_file"/>
-    <!--<load module="mod_opusfile"/>-->
-    <load module="mod_png"/>
-    <!-- <load module="mod_shell_stream"/> -->
-    <!--For icecast/mp3 streams/files-->
-    <!--<load module="mod_shout"/>-->
-    <!--For local streams (play all the files in a directory)-->
-    <load module="mod_local_stream"/>
-    <load module="mod_tone_stream"/>
-
-    <!-- Timers -->
-    <!-- <load module="mod_timerfd"/> -->
-    <!-- <load module="mod_posix_timer"/> -->
-
-    <!-- Languages -->
-    <!-- <load module="mod_v8"/> -->
-    <!-- <load module="mod_perl"/> -->
-    <!-- <load module="mod_python"/> -->
-    <!-- <load module="mod_python3"/> -->
-    <!-- <load module="mod_java"/> -->
-    <load module="mod_lua"/>
-
-    <!-- ASR /TTS -->
-    <!-- <load module="mod_flite"/> -->
-    <!-- <load module="mod_pocketsphinx"/> -->
-    <!-- <load module="mod_cepstral"/> -->
-    <!-- <load module="mod_tts_commandline"/> -->
-    <!-- <load module="mod_rss"/> -->
-
-    <!-- Say -->
-    <load module="mod_say_en"/>
-    <!-- <load module="mod_say_ru"/> -->
-    <!-- <load module="mod_say_zh"/> -->
-    <!-- <load module="mod_say_sv"/> -->
-
-    <!-- Third party modules -->
-    <!--<load module="mod_nibblebill"/>-->
-    <!--<load module="mod_callcenter"/>-->
-
-  </modules>
-</configuration>
-EOF;
-
-	try {
-		$fhandle = fopen('/etc/freeswitch/autoload_configs/modules.conf.xml', w);
-		fwrite($fhandle, $module_data);
-		fclose($fhandle);
-	} catch (\Throwable $e) {
-		// do nothing
+	//
+	// ask freeswitch to restart
+	//
+	$socket = new event_socket;
+	if (!$socket->connect('fs', '8021', 'ClueCon')) {
+		echo "Unable to connect to event socket\n";
+	} else {
+		$cmd = "api fsctl shutdown";
+		$result = $socket->request($cmd);
+		if( $result !== false && !empty($result)) {
+			if($result === '+OK') {
+				echo "FreeSWITCH restarting successfully\n";
+			}
+		}
 	}
 
-
-
+	//
 	//finish
+	//
 	echo "+----------------------------+\n";
 	echo "|+--------------------------+|\n";
 	echo "||  DATABASE INIT FINISHED  ||\n";
