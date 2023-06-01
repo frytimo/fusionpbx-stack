@@ -81,7 +81,7 @@ services:
       - ./php/config:/usr/local/etc/php:ro
       - ./php/config:/usr/local/etc/php-fpm.d:ro
       - ./php/supervisord.conf:/etc/supervisord.conf:ro
-      - ./freeswitch/conf:/etc/freeswitch
+      - fs-config:/etc/freeswitch
       - ./freeswitch/logs:/var/log/freeswitch
       - ./freeswitch/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
@@ -122,7 +122,7 @@ volumes:
     name: fpbx-db-${POSTGRES_VERSION}
   fpbx-fs-modules:
     name: fpbx-fs-${FREESWITCH_VERSION}
+  fs-config:
+    name: fs-config-${FREESWITCH_VERSION}
   fpbx-config:
     name: fpbx-config
-  fs-config:
-    name: fs-config
