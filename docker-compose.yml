@@ -31,7 +31,7 @@ services:
     volumes:
       - ./fusionpbx/etc/:/etc/fusionpbx
       - ./freeswitch/setup:/docker-entrypoint.d
-      - ./freeswitch/conf:/etc/freeswitch
+      - fs-config:/etc/freeswitch
       - ./freeswitch/logs:/var/log/freeswitch
       - ./freeswitch/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
@@ -89,6 +89,7 @@ services:
       - ./freeswitch/images:/var/lib/freeswitch/images
       - ./freeswitch/storage:/var/lib/freeswitch/storage
       - ./freeswitch/recordings:/var/lib/freeswitch/recordings
+      - fpbx-fs-modules:/usr/lib/freeswitch/mod
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
   web:
     build:
@@ -119,3 +120,9 @@ services:
 volumes:
   fpbx-db:
     name: fpbx-db-${POSTGRES_VERSION}
+  fpbx-fs-modules:
+    name: fpbx-fs-${FREESWITCH_VERSION}
+  fpbx-config:
+    name: fpbx-config
+  fs-config:
+    name: fs-config
