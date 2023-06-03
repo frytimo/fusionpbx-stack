@@ -52,6 +52,8 @@ WORKDIR /
 
 COPY ./docker-entrypoint.sh /
 
+RUN echo "alias ls='ls --color=auto'" >> ~/.bashrc
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Supervisor will run PHP-FPM and Laravel queue workers
