@@ -68,8 +68,13 @@ services:
       - fs
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # Activating the environment variable has a side effect of always trying to connect to the host
+    # no matter how the xdebug-helper extension is set. To use the CLI you can either uncomment
+    # the environment variables section below or export the variable when inside the container.
+    # export XDEBUG_CONFIG="mode=trigger client_host=host.docker.internal idekey=${IDEKEY}"
     environment:
-      XDEBUG_CONFIG: "mode=development,debug client_host=host.docker.internal idekey=${IDEKEY}"
+      #XDEBUG_CONFIG: "mode=trigger client_host=host.docker.internal idekey=${IDEKEY}"
+      IDEKEY: "${IDEKEY}"
     volumes:
       - ./fusionpbx/fusionpbx:/var/www/fusionpbx
       - ./fusionpbx/etc/:/etc/fusionpbx:ro
@@ -91,6 +96,7 @@ services:
       - ./freeswitch/recordings:/var/lib/freeswitch/recordings
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
+      - ./logs/php/xdebug:/tmp/docker-xdebug
   web:
     build:
       context: ./nginx
