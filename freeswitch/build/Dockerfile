@@ -17,9 +17,10 @@ ARG DEBIAN_VERSION="11"
 #
 FROM debian:$DEBIAN_VERSION
 
-ENV VOLUME_FAX=/var/lib/freeswitch/storage/fax
-ENV VOLUME_RECORDINGS=/var/lib/freeswitch/recordings
-ENV VOLUME_VOICEMAIL=/var/lib/freeswitch/storage/voicemail
+ENV FS_FAX=/var/lib/freeswitch/storage/fax
+ENV FS_RECORDINGS=/var/lib/freeswitch/recordings
+ENV FS_VOICEMAIL=/var/lib/freeswitch/storage/voicemail
+
 #
 # Comment out this section if files are not already downloaded and uncomment section 'git clone' below
 #
@@ -33,7 +34,7 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
-RUN apt update && apt install -y libtool build-essential gosu yasm autoconf libtool-bin pkg-config wget git bind9-host
+RUN apt update && apt install -y libtool build-essential gosu yasm autoconf libtool-bin pkg-config wget git bind9-host unixodbc odbc-postgresql
 WORKDIR /
 
 RUN echo "/usr/lib" | tee /etc/ld.so.conf.d/sofia_sip.so.conf && echo "/usr/lib" | tee /etc/ld.so.conf.d/spandsp.so.conf && ldconfig
@@ -141,6 +142,13 @@ RUN apt update && apt install -y supervisor
 COPY ./supervisord.conf /etc/supervisord.conf
 
 #
+# Copy the ODBC.ini file
+#
+ARG ODBCINI=/etc/odbc.ini
+ENV ODBCINI=${ODBCINI}
+COPY ./odbc.ini ${ODBCINI}
+
+#
 # Clean up
 #
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -149,6 +157,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Create user
 #
 RUN addgroup -q --gid 1000 fusionpbx && adduser --gecos "" --shell /bin/bash -q --no-create-home --uid 1000 --gid 1000 fusionpbx
+
+RUN echo "alias ls='ls --color=auto'" >> ~/.bashrc
+
+RUN chown -R fusionpbx:fusionpbx /etc/freeswitch
 
 # Healthcheck to make sure the service is running
 SHELL ["/bin/bash"]
