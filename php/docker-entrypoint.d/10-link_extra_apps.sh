@@ -1,14 +1,13 @@
 #!/usr/bin/env sh
 set -e
-echo "LOADING EXTRA APPS..."
+echo "LINKING EXTRA APPS..."
 
 #
-# set each of the directories in the extra_apps folder to be included in fusionpbx
+# link each of the directories in the /usr/local/src/fusionpbx_extra_apps folder to the fusionpbx destination in the container
 #
-for app in /usr/local/src/extra_apps/*; do
+for app in /usr/local/src/fusionpbx_extra_apps/*; do
     _APP="$(basename ${app})"
-    echo "${_APP}"
-    [ -d "${app}" ] && su -c "cp -R \"${app}\" \"/var/www/fusionpbx/app\"" fusionpbx
+    [ -d "${app}" ] && [ ! -L "/var/www/fusionpbx/app/${_APP}" ] && echo "LINKING ${_APP}" && ln -s "${app}" /var/www/fusionpbx/app
 done
 
-echo "DONE"
+echo "Linked all extra_apps"
