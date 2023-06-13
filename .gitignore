@@ -15,3 +15,4 @@ fusionpbx/etc/config.conf
 fusionpbx/fusionpbx/
 postgres/db/pgdata/
 logs/php/xdebug/*
+/freeswitch/conf/
