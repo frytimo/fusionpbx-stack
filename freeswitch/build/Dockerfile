@@ -66,7 +66,7 @@ RUN cd /usr/local/src/sofia-sip \
 #
 # Update / Install packages for freeswitch compile
 #
-RUN apt update && apt install -y libmpg123-dev libshout3-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev libspeexdsp-dev libldns-dev libedit-dev libavformat-dev libswscale-dev liblua5.3-dev doxygen libluajit-5.1-dev liblualib50-dev libpq-dev unixodbc-dev libopus-dev libsndfile-dev erlang-dev libmp3lame-dev libsnmp-dev python3-dev uuid-dev
+RUN apt update && apt install -y libmpg123-dev libshout3-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev libspeexdsp-dev libldns-dev libedit-dev libavformat-dev libswscale-dev liblua5.3-dev doxygen libluajit-5.1-dev liblualib50-dev libpq-dev unixodbc-dev libopus-dev libsndfile-dev erlang-dev libmp3lame-dev libsnmp-dev swig python3-dev uuid-dev
 
 #
 # Update libraries
@@ -88,6 +88,7 @@ RUN cd /usr/local/src/freeswitch \
 RUN cd /usr/local/src/freeswitch \
   && sed -i "s|applications/mod_signalwire|#applications/mod_signalwire|g" modules.conf \
   && sed -i "s|endpoints/mod_verto|#endpoints/mod_verto|g" modules.conf \
+  && sed -i "s|#applications/mod_esl|applications/mod_esl|g" modules.conf \
   && sed -i "s|#applications/mod_lcr|applications/mod_lcr|g" modules.conf \
   && sed -i "s|#applications/mod_nibblebill|applications/mod_nibblebill|g" modules.conf \
   && sed -i "s|#event_handlers/mod_snmp|event_handlers/mod_snmp|g" modules.conf \
@@ -116,7 +117,7 @@ RUN cd /usr/local/src/freeswitch \
 #
 # make and install freeswitch using all cores
 #
-RUN cd /usr/local/src/freeswitch && make CFLAGS="-Wno-error=format-truncation" CXXFLAGS="-Wno-error=format-truncation" -i -j$(nproc)
+RUN cd /usr/local/src/freeswitch && ln -s /usr/bin/swig /usr/bin/swig3.0 && make CFLAGS="-Wno-error=format-truncation" CXXFLAGS="-Wno-error=format-truncation" -i -j$(nproc) && make swigall
 RUN cd /usr/local/src/freeswitch && make install
 
 #
