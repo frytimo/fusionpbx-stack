@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -e
+echo "LOADING EXTRA APPS..."
+
+#
+# copy each of the directories in the extra_apps folder to the fusionpbx destination
+#
+for app in /usr/local/src/extra_apps/*; do
+    _APP="$(basename ${app})"
+    [ -d "${app}" ] && echo "COPYING ${_APP}" && cp --preserve=mode,ownership,timestamps -Rn "${app}" /var/www/fusionpbx/app && echo "DONE"
+done
+
+echo "Copied all extra_apps"
