@@ -31,7 +31,6 @@ services:
     volumes:
       - ./fusionpbx/etc/:/etc/fusionpbx
       - ./freeswitch/setup:/docker-entrypoint.d
-      - fs-config:/etc/freeswitch
       - ./freeswitch/logs:/var/log/freeswitch
       - ./freeswitch/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
@@ -40,6 +39,8 @@ services:
       - ./freeswitch/storage:/var/lib/freeswitch/storage
       - ./freeswitch/recordings:/var/lib/freeswitch/recordings
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
+      - fs-config:/etc/freeswitch
+      - fpbx-fs-modules:/usr/lib/freeswitch/mod
     extra_hosts:
       - "switch.internal_ip:127.0.0.1"
       - "switch.external_ip:host-gateway"
@@ -80,13 +81,11 @@ services:
       - ./fusionpbx/etc/:/etc/fusionpbx:ro
       - ./fusionpbx/upgrade_apps/init_database.php:/var/www/fusionpbx/core/upgrade/init_database.php
       - ./fusionpbx/upgrade_apps/upgrade_menu.php:/var/www/fusionpbx/core/upgrade/upgrade_menu.php
-      - ./fusionpbx/extra_apps:/usr/local/src/extra_apps
       - ./php/docker-entrypoint.d:/docker-entrypoint.d:ro
       - ./php/socket:/var/run/php
       - ./php/config:/usr/local/etc/php:ro
       - ./php/config:/usr/local/etc/php-fpm.d:ro
       - ./php/supervisord.conf:/etc/supervisord.conf:ro
-      - fs-config:/etc/freeswitch
       - ./freeswitch/logs:/var/log/freeswitch
       - ./freeswitch/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
@@ -94,9 +93,11 @@ services:
       - ./freeswitch/images:/var/lib/freeswitch/images
       - ./freeswitch/storage:/var/lib/freeswitch/storage
       - ./freeswitch/recordings:/var/lib/freeswitch/recordings
+      - ./logs/php/xdebug:/tmp/docker-xdebug
+      - fs-config:/etc/freeswitch
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
-      - ./logs/php/xdebug:/tmp/docker-xdebug
+      - /usr/local/src/fusionpbx_extra_apps:/usr/local/src/fusionpbx_extra_apps
   web:
     build:
       context: ./nginx
