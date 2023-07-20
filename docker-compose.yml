@@ -14,6 +14,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - fpbx-db:/var/lib/postgresql/data/pgdata
+      - ./postgres/mount:/opt
     ports:
       - 5432:5432
   php:
