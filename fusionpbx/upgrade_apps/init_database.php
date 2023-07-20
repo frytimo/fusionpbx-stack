@@ -41,6 +41,10 @@
 	define('DB_USERNAME', $settings['database.0.username']);
 	define('DB_PASSWORD', $settings['database.0.password']);
 
+	if(empty($settings['init.domain.name'])) $settings['init.domain.name'] = 'localhost';
+	if(empty($settings['init.admin.name']))  $settings['init.admin.name'] = 'admin';
+	if(empty($settings['init.admin.password'])) $settings['init.admin.password'] = 'password';
+
 	// initial settings to use for admin login and password
 	define('DOMAIN_NAME',    $settings['init.domain.name']);
 	define('ADMIN_NAME',     $settings['init.admin.name']);
@@ -242,38 +246,110 @@
 	}
 
 	function rewrite_event_socket_config() {
-//		$xml_object = simplexml_load_file('/etc/freeswitch/autoload_configs/event_socket.conf.xml');
-//		$json = json_encode($xml_object);
-//		$conf_array = json_decode($json, true);
-//
-//		$found = false;
-//		$inbound_acl_exists = false;
-//		$sb = '<configuration name="event_socket.conf" description="Socket Client">' . "\n";
-//		$sb .= '	<settings>'."\n";
-//		foreach($conf_array['settings']['param'] as &$param) {
-//			$sb .= "		<param";
-//			foreach($param as &$attributes) {
-//				foreach($attributes as $key => &$value) {
-//					if($found) {
-//						$value = '0.0.0.0';
-//					}
-//					$found = ($value === 'listen-ip');
-//					if($value === 'apply-inbound-acl') {
-//						$inbound_acl_exists = true;
-//					}
-//					$sb .= " $key=\"$value\"";
-//				}
-//			}
-//			$sb .= " />\n";
-//		}
-//		if(!$inbound_acl_exists) {
-//			$sb .= '		<param name="apply-inbound-acl" value="any_v4.auto" />' . "\n";
-//		}
-//		$sb .= '	</settings>'."\n";
-//		$sb .= '</configuration>';
-//		$fhandle = fopen('/etc/freeswitch/autoload_configs/event_socket.conf.xml', 'w');
-//		fwrite($fhandle, $sb);
-//		fclose($fhandle);
+	//ensure the sip profile directories are present
+	make_directory('/etc/freeswitch/sip_profiles');
+	make_directory('/etc/freeswitch/sip_profiles/internal');
+	make_directory('/etc/freeswitch/sip_profiles/external');
+	make_directory('/etc/freeswitch/autoload_configs');
+
+	$data = <<<EOF
+<configuration name="sofia.conf" description="sofia Endpoint">
+
+  <global_settings>
+    <param name="log-level" value="0"/>
+    <!-- <param name="auto-restart" value="false"/> -->
+    <param name="debug-presence" value="0"/>
+    <!-- <param name="capture-server" value="udp:homer.domain.com:5060"/> -->
+  </global_settings>
+
+  <!--
+      The rabbit hole goes deep.  This includes all the
+      profiles in the sip_profiles directory that is up
+      one level from this directory.
+  -->
+  <profiles>
+    <X-PRE-PROCESS cmd="include" data="../sip_profiles/*.xml"/>
+  </profiles>
+
+</configuration>
+EOF;
+
+	if(!file_exists('/etc/freeswitch/autoload_configs/sofia.conf.xml'))
+		file_put_contents('/etc/freeswitch/autoload_configs/sofia.conf.xml', $data);
+
+	$data = <<<EOF
+<?xml version="1.0"?>
+<!--
+    NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+    This is the FreeSWITCH default config.  Everything you see before you now traverses
+    down into all the directories including files which include more files.  The default
+    config comes out of the box already working in most situations as a PBX.  This will
+    allow you to get started testing and playing with various things in FreeSWITCH.
+
+    Before you start to modify this default please visit this wiki page:
+
+    http://wiki.freeswitch.org/wiki/Getting_Started_Guide#Some_stuff_to_try_out.21
+
+    If all else fails you can read our FAQ located at:
+
+    http://wiki.freeswitch.org/wiki/FreeSwitch_FAQ
+
+    NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+-->
+<document type="freeswitch/xml">
+  <!--#comment
+      All comments starting with #command will be preprocessed and never sent to the xml parser
+      Valid instructions:
+      #include ==> Include another file to this exact point
+                   (partial xml should be encased in <include></include> tags)
+      #set     ==> Set a global variable (can be expanded during preprocessing with $$ variables)
+                   (note the double $$ which denotes preprocessor variables)
+      #comment ==> A general comment such as this
+
+      The preprocessor will compile the full xml document to ${prefix}/log/freeswitch.xml.fsxml
+      Don't modify it while freeswitch is running cos it is mem mapped in most cases =D
+
+      The same can be achieved with the <X-PRE-PROCESS> tag where the attrs 'cmd' and 'data' are
+      parsed in the same way.
+  -->
+  <!--#comment
+      vars.xml contains all the #set directives for the preprocessor.
+  -->
+  <X-PRE-PROCESS cmd="include" data="vars.xml"/>
+
+  <section name="configuration" description="Various Configuration">
+    <X-PRE-PROCESS cmd="include" data="autoload_configs/*.xml"/>
+  </section>
+
+  <section name="dialplan" description="Regex/XML Dialplan">
+    <X-PRE-PROCESS cmd="include" data="dialplan/*.xml"/>
+  </section>
+
+  <section name="chatplan" description="Regex/XML Chatplan">
+    <X-PRE-PROCESS cmd="include" data="chatplan/*.xml"/>
+  </section>
+
+  <!-- mod_dingaling is reliant on the vcard data in the "directory" section. -->
+  <!-- mod_sofia is reliant on the user data for authorization -->
+  <section name="directory" description="User Directory">
+    <X-PRE-PROCESS cmd="include" data="directory/*.xml"/>
+  </section>
+
+  <!-- languages section -->
+  <section name="languages" description="Language Management">
+    <X-PRE-PROCESS cmd="include" data="languages/de/*.xml"/>
+    <X-PRE-PROCESS cmd="include" data="languages/en/*.xml"/>
+    <X-PRE-PROCESS cmd="include" data="languages/es/*.xml"/>
+    <X-PRE-PROCESS cmd="include" data="languages/fr/*.xml"/>
+    <X-PRE-PROCESS cmd="include" data="languages/ru/*.xml"/>
+    <X-PRE-PROCESS cmd="include" data="languages/he/*.xml"/>
+    <X-PRE-PROCESS cmd="include" data="languages/pt/*.xml"/>
+  </section>
+</document>
+EOF;
+	if(!file_exists('/etc/freeswitch/freeswitch.xml'))
+		file_put_contents('etc/freeswitch/freeswitch.xml', $data);
 
 		$data = <<<EOF
 <configuration name="event_socket.conf" description="Socket Client">
@@ -577,11 +653,6 @@ EOF;
 		db_execute($con, "update v_settings set event_socket_ip_address = 'fs' where setting_uuid = 'ce1b1936-fc61-4e8c-84cf-252a510a74fd'");
 	}
 
-	//ensure the sip profile directories are present
-	make_directory('/etc/freeswitch/sip_profiles');
-	make_directory('/etc/freeswitch/sip_profiles/internal');
-	make_directory('/etc/freeswitch/sip_profiles/external');
-	
 //	//now run the core upgrade twice
 //
 //	try {
@@ -592,7 +663,14 @@ EOF;
 //	} catch (\Throwable $t) {
 //
 //	}
+	try {
+		// consume the output
+		ob_start();
+		include CORE_DIR . '/upgrade/upgrade.php';
+		ob_end_clean();
+	} catch (\Throwable $t) {
 
+	}
 	// inject the DSN in to the database
 	if(!dsn_exists($con)) {
 		echo "\n\n";

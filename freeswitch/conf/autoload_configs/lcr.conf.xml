@@ -1,8 +1,0 @@
-<!-- WARNING! THIS FILE IS MANAGED BY FUSIONPBX. DO NOT MODIFY DIRECTLY! -->
-<configuration name="lcr.conf" description="LCR Configuration">
-  <settings>
-    <param name="odbc-dsn" value="pgsql://hostaddr=db port=5432 dbname=fusionpbx user=fusionpbx password=fusionpbx"/>
-  </settings>
-    <profiles>
-  </profiles>
-</configuration>

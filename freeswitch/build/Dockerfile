@@ -17,6 +17,9 @@ ARG DEBIAN_VERSION="11"
 #
 FROM debian:$DEBIAN_VERSION
 
+ARG PHP_VERSION=8.1
+ENV PHP_VERSION=${PHP_VERSION}
+
 ENV FS_FAX=/var/lib/freeswitch/storage/fax
 ENV FS_RECORDINGS=/var/lib/freeswitch/recordings
 ENV FS_VOICEMAIL=/var/lib/freeswitch/storage/voicemail
@@ -28,14 +31,21 @@ COPY ./freeswitch/ /usr/local/src/freeswitch/
 COPY ./sofia-sip/ /usr/local/src/sofia-sip/
 COPY ./spandsp/ /usr/local/src/spandsp/
 # comment out next line if they are not already downloaded
-#COPY ./sounds/freeswitch-sounds-*.tar.gz /usr/local/src/freeswitch/
+COPY ./sounds/freeswitch-sounds-*.tar.gz /usr/local/src/freeswitch/
 
 RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
-RUN apt update && apt install -y libtool build-essential gosu yasm autoconf libtool-bin pkg-config wget git bind9-host unixodbc odbc-postgresql
+RUN apt update && apt install -y libtool build-essential gosu yasm autoconf libtool-bin pkg-config wget git bind9-host unixodbc odbc-postgresql lsb-release
 WORKDIR /
+
+#
+# PHP Dev packages for ESL (only works on php 7.xx)
+#
+RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
+  && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list \
+  && apt update && apt install -y php${PHP_VERSION}-dev
 
 RUN echo "/usr/lib" | tee /etc/ld.so.conf.d/sofia_sip.so.conf && echo "/usr/lib" | tee /etc/ld.so.conf.d/spandsp.so.conf && ldconfig
 
@@ -45,7 +55,7 @@ RUN apt update && apt install -y libtiff-dev
 # Setup spandsp
 #
 RUN cd /usr/local/src/spandsp \
-  && git checkout -b build \
+  && git checkout 0d2e6ac65e0e8f53d652665a743015a88bf048d4 -b build \
   && ./bootstrap.sh \
   && ./configure --prefix=/usr \
   && make -i -j$(nproc) \
@@ -57,7 +67,7 @@ RUN cd /usr/local/src/spandsp \
 RUN apt update && apt install -y libssl-dev
 
 RUN cd /usr/local/src/sofia-sip \
-  && git checkout -b build \
+  && git checkout tags/v1.13.16 -b build \
   && ./bootstrap.sh \
   && ./configure --prefix=/usr \
   && make -i -j$(nproc) \
@@ -66,7 +76,18 @@ RUN cd /usr/local/src/sofia-sip \
 #
 # Update / Install packages for freeswitch compile
 #
-RUN apt update && apt install -y libmpg123-dev libshout3-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev libspeexdsp-dev libldns-dev libedit-dev libavformat-dev libswscale-dev liblua5.3-dev doxygen libluajit-5.1-dev liblualib50-dev libpq-dev unixodbc-dev libopus-dev libsndfile-dev erlang-dev libmp3lame-dev libsnmp-dev swig python3-dev uuid-dev
+RUN apt update && apt install -y libmpg123-dev libshout3-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev libspeexdsp-dev libldns-dev libedit-dev libavformat-dev libswscale-dev liblua5.3-dev doxygen libluajit-5.1-dev liblualib50-dev libpq-dev unixodbc-dev libopus-dev libsndfile-dev erlang-dev libmp3lame-dev libsnmp-dev python3-dev uuid-dev
+
+RUN apt install -y libboost-dev bison
+
+COPY ./swig/ /usr/local/src/swig/
+
+RUN cd /usr/local/src/swig \
+  && git checkout -b build \
+  && ./autogen.sh \
+  && ./configure --prefix=/usr \
+  && make -j$(nproc) \
+  && make install
 
 #
 # Update libraries
@@ -77,7 +98,7 @@ RUN ldconfig
 # Switch to a release version
 #
 ARG FREESWITCH_VERSION=1.10.9
-RUN cd /usr/local/src/freeswitch && git checkout tags/v$FREESWITCH_VERSION -b v$FREESWITCH_VERSION
+RUN cd /usr/local/src/freeswitch && git checkout tags/v$FREESWITCH_VERSION -b v$FREESWITCH_VERSION-compile
 
 RUN cd /usr/local/src/freeswitch \
   && ./bootstrap.sh

@@ -1,5 +1,5 @@
 --	Part of FusionPBX
---	Copyright (C) 2010-2022 Mark J Crane <markjcrane@fusionpbx.com>
+--	Copyright (C) 2010-2023 Mark J Crane <markjcrane@fusionpbx.com>
 --	All rights reserved.
 --
 --	Redistribution and use in source and binary forms, with or without
@@ -145,6 +145,8 @@
 		sounds_dir = session:getVariable("sounds_dir");
 		username = session:getVariable("username");
 		dialplan = session:getVariable("dialplan");
+		sip_from_user = session:getVariable("sip_from_user");
+		sip_to_user = session:getVariable("sip_to_user");
 		caller_id_name = session:getVariable("caller_id_name");
 		caller_id_number = session:getVariable("caller_id_number");
 		outbound_caller_id_name = session:getVariable("outbound_caller_id_name");
@@ -195,12 +197,6 @@
 		if (not default_voice) then default_voice = 'callie'; end
 	end
 
---get record_ext
-	record_ext = session:getVariable("record_ext");
-	if (not record_ext) then
-		record_ext = "wav";
-	end
-
 --prepare the api object
 	api = freeswitch.API();
 
@@ -240,25 +236,27 @@
 		missed_call_data = row["ring_group_missed_call_data"];
 	end);
 
---set the recording path
+--prepare the recording path
 	record_path = recordings_dir .. "/" .. domain_name .. "/archive/" .. os.date("%Y/%b/%d");
 	record_path = record_path:gsub("\\", "/");
 
---set the recording file name
+--prepare the recording name and file extension
 	if (session:ready()) then
-		--record_name = session:getVariable("record_name");
-		--sip_from_user = session:getVariable("sip_from_user");
-		--sip_to_user = session:getVariable("sip_to_user");
-
-		--record_name = record_name:gsub("${caller_id_name}", caller_id_name);
-		--record_name = record_name:gsub("${caller_id_number}", caller_id_number);
-		--record_name = record_name:gsub("${sip_from_user}", sip_from_user);
-		--record_name = record_name:gsub("${sip_to_user}", sip_to_user);
-		--record_name = record_name:gsub("${dialed_user}", ring_group_extension);
-
-		--if (not record_name) then
+		record_name = session:getVariable("record_name");
+		record_ext = session:getVariable("record_ext");
+		if (not record_ext) then record_ext = 'wav'; end
+		if (record_name) then
+			record_name = record_name:gsub("${caller_id_name}", caller_id_name);
+			record_name = record_name:gsub("${caller_id_number}", caller_id_number);
+			record_name = record_name:gsub("${sip_from_user}", sip_from_user);
+			record_name = record_name:gsub("${sip_to_user}", sip_to_user);
+			record_name = record_name:gsub("${dialed_user}", ring_group_extension);
+			record_name = record_name:gsub("${record_ext}", record_ext);
+			record_name = record_name:gsub("${domain_name}", domain_name);
+			record_name = record_name:gsub("${destination_number}", destination_number);
+		else
 			record_name = uuid .. "." .. record_ext;
-		--end
+		end
 	end
 
 ---set the call_timeout to a higher value to prevent the early timeout of the ring group
@@ -357,6 +355,7 @@
 					subject = subject:gsub("${ring_group_extension}", ring_group_extension);
 					subject = subject:gsub("${sip_to_user}", ring_group_name);
 					subject = subject:gsub("${dialed_user}", ring_group_extension);
+					subject = subject:gsub("${destination_number}", destination_number);
 					subject = trim(subject);
 					subject = '=?utf-8?B?'..base64.encode(subject)..'?=';
 
@@ -367,6 +366,7 @@
 					body = body:gsub("${ring_group_extension}", ring_group_extension);
 					body = body:gsub("${sip_to_user}", ring_group_name);
 					body = body:gsub("${dialed_user}", ring_group_extension);
+					body = body:gsub("${destination_number}", destination_number);
 					body = body:gsub(" ", "&nbsp;");
 					body = body:gsub("%s+", "");
 					body = body:gsub("&nbsp;", " ");
@@ -477,7 +477,13 @@
 			sql = [[
 				SELECT
 					r.ring_group_strategy, r.ring_group_timeout_app, r.ring_group_distinctive_ring,
-					d.destination_number, d.destination_delay, d.destination_timeout, d.destination_prompt,
+					d.destination_number, d.destination_timeout, d.destination_prompt,
+					CASE
+						WHEN r.ring_group_strategy = 'enterprise'
+							THEN d.destination_delay * 1000
+						WHEN r.ring_group_strategy <> 'enterprise'
+							THEN d.destination_delay
+					END as destination_delay,
 					r.ring_group_caller_id_name, r.ring_group_caller_id_number, 
 					r.ring_group_cid_name_prefix, r.ring_group_cid_number_prefix, 
 					r.ring_group_timeout_data, r.ring_group_ringback
@@ -585,7 +591,12 @@
 						--get the follow me destinations
 						if (follow_me_uuid ~= nil and row.is_follow_me_destination ~= "true") then
 							sql = "select d.domain_uuid, d.domain_name, f.follow_me_destination as destination_number, ";
-							sql = sql .. "f.follow_me_delay as destination_delay, f.follow_me_timeout as destination_timeout, ";
+							if (row.ring_group_strategy == 'enterprise') then
+								sql = sql .. "f.follow_me_delay * 1000 as destination_delay, ";
+							else
+								sql = sql .. "f.follow_me_delay as destination_delay, ";
+							end
+							sql = sql .. "f.follow_me_timeout as destination_timeout, ";
 							sql = sql .. "f.follow_me_prompt as destination_prompt ";
 							sql = sql .. "from v_follow_me_destinations as f, v_domains as d ";
 							sql = sql .. "where f.follow_me_uuid = :follow_me_uuid ";
@@ -614,7 +625,8 @@
 								if (tonumber(field.destination_timeout) < (tonumber(row.destination_timeout) - tonumber(field.destination_delay))) then
 									new_destination_timeout = field.destination_timeout;
 								else
-									new_destination_timeout = row.destination_timeout - field.destination_delay;
+									--new_destination_timeout = row.destination_timeout - field.destination_delay;
+									new_destination_timeout = row.destination_timeout;
 								end
 
 								--add to the destinations array
@@ -630,7 +642,7 @@
 								destinations[new_key]['ring_group_ringback'] = row.ring_group_ringback;
 								destinations[new_key]['domain_name'] = field.domain_name;
 								destinations[new_key]['destination_number'] = field.destination_number;
-								destinations[new_key]['destination_delay'] = field.destination_delay + row.destination_delay;
+								destinations[new_key]['destination_delay'] = tonumber(field.destination_delay) + tonumber(row.destination_delay);
 								destinations[new_key]['destination_timeout'] = new_destination_timeout;
 								destinations[new_key]['destination_prompt'] = field.destination_prompt;
 								destinations[new_key]['group_confirm_key'] = row.group_confirm_key;
@@ -741,12 +753,13 @@
 							delimiter = ":_:";
 						end
 
-					--leg delay settings
+					--leg delay and timeout settings
 						if (ring_group_strategy == "enterprise") then
 							delay_name = "originate_delay_start";
-							destination_delay = destination_delay * 500;
+							timeout_name = "originate_timeout";
 						else
 							delay_name = "leg_delay_start";
+							timeout_name = "leg_timeout";
 						end
 
 					--export the ringback
@@ -801,6 +814,7 @@
 					--record the session
 						if (record_session) then
 							record_session = ",api_on_answer='uuid_record "..uuid.." start ".. record_path .. "/" .. record_name .. "',record_path='".. record_path .."',record_name="..record_name;
+							session:setVariable("record_path", record_path);
 						else
 							record_session = ""
 						end
@@ -820,15 +834,15 @@
 							end
 
 							--send to user
-							local dial_string_to_user = "[sip_invite_domain="..domain_name..",domain_name="..domain_name..",call_direction="..call_direction..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay..",dialed_extension=" .. row.destination_number .. ",extension_uuid=".. extension_uuid .. row.record_session .. hold_music .."]user/" .. row.destination_number .. "@" .. domain_name;
+							local dial_string_to_user = "[sip_invite_domain="..domain_name..",domain_name="..domain_name..",call_direction="..call_direction..","..group_confirm..""..timeout_name.."="..destination_timeout..","..delay_name.."="..destination_delay..",dialed_extension=" .. row.destination_number .. ",extension_uuid=".. extension_uuid .. row.record_session .. hold_music .."]user/" .. row.destination_number .. "@" .. domain_name;
 							dial_string = dial_string_to_user;
 						elseif (tonumber(destination_number) == nil) then
 							--sip uri
-							dial_string = "[sip_invite_domain="..domain_name..",domain_name="..domain_name..",call_direction="..call_direction..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay.."]" .. row.destination_number;
+							dial_string = "[sip_invite_domain="..domain_name..",domain_name="..domain_name..",call_direction="..call_direction..","..group_confirm..""..timeout_name.."="..destination_timeout..","..delay_name.."="..destination_delay.."]" .. row.destination_number;
 						else
 							--external number
 								-- have to double destination_delay here due a FS bug requiring a 50% delay value for internal externsions, but not external calls. 
-								destination_delay = destination_delay * 2;
+								--destination_delay = destination_delay * 2;
 
 								route_bridge = 'loopback/'..destination_number;
 								if (extension_toll_allow ~= nil) then
@@ -864,7 +878,7 @@
 								end
 
 							--set the destination dial string
-								dial_string = "[toll_allow=".. toll_allow ..",".. caller_id ..",sip_invite_domain="..domain_name..",domain_name="..domain_name..",domain_uuid="..domain_uuid..",call_direction="..call_direction..","..group_confirm.."leg_timeout="..destination_timeout..","..delay_name.."="..destination_delay.."]"..route_bridge
+								dial_string = "[toll_allow=".. toll_allow ..",".. caller_id ..",sip_invite_domain="..domain_name..",domain_name="..domain_name..",domain_uuid="..domain_uuid..",call_direction="..call_direction..","..group_confirm..""..timeout_name.."="..destination_timeout..","..delay_name.."="..destination_delay.."]"..route_bridge
 						end
 
 					--add a delimiter between destinations

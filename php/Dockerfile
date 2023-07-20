@@ -1,5 +1,5 @@
-ARG PHP_VERSION=8.1-fpm
-FROM php:${PHP_VERSION}
+ARG PHP_VERSION=8.1
+FROM php:${PHP_VERSION}-fpm
 
 # install the php-extensions script to simplify dockerfile
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
