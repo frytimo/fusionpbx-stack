@@ -138,7 +138,7 @@ RUN cd /usr/local/src/freeswitch \
 #
 # make and install freeswitch using all cores
 #
-RUN cd /usr/local/src/freeswitch && ln -s /usr/bin/swig /usr/bin/swig3.0 && make CFLAGS="-Wno-error=format-truncation" CXXFLAGS="-Wno-error=format-truncation" -i -j$(nproc) && make swigall
+RUN cd /usr/local/src/freeswitch && ln -s /usr/bin/swig /usr/bin/swig3.0 && make CFLAGS="-Wno-error=format-truncation" CXXFLAGS="-Wno-error=format-truncation" -i -j$(nproc) && make swigall && cd /usr/local/src/freeswitch/libs/esl/php && make swigclean && make
 RUN cd /usr/local/src/freeswitch && make install
 
 #
