@@ -49,7 +49,7 @@ services:
       - ./php/config:/usr/local/etc/php-fpm.d:ro
       - ./php/supervisord.conf:/etc/supervisord.conf:ro
       - ./logs/freeswitch:/var/log/freeswitch
-      - ./freeswitch/scripts:/usr/share/freeswitch/scripts
+      - fpbx-scripts:/var/www/fusionpbx/app/switch/resources/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
       - ./freeswitch/db:/var/lib/freeswitch/db
       - ./freeswitch/images:/var/lib/freeswitch/images
@@ -60,6 +60,7 @@ services:
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
       - /usr/local/src/fusionpbx_extra_apps:/usr/local/src/fusionpbx_extra_apps
+      - php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
   fs:
     image: fpbx-fs:${FREESWITCH_VERSION}
     build:
@@ -68,6 +69,7 @@ services:
       args:
         - FREESWITCH_VERSION=${FREESWITCH_VERSION}
     container_name: fpbx-fs
+    hostname: fs
     depends_on:
       - php
       - db
@@ -78,7 +80,7 @@ services:
       - ./fusionpbx/etc/:/etc/fusionpbx
       - ./freeswitch/setup:/docker-entrypoint.d
       - ./logs/freeswitch:/var/log/freeswitch
-      - ./freeswitch/scripts:/usr/share/freeswitch/scripts
+      - fpbx-scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
       - ./freeswitch/db:/var/lib/freeswitch/db
       - ./freeswitch/images:/var/lib/freeswitch/images
@@ -87,6 +89,8 @@ services:
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
       - fs-config:/etc/freeswitch
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
+      - php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
+      - ./fusionpbx/fusionpbx:/var/www/fusionpbx
     extra_hosts:
       - "switch.internal_ip:127.0.0.1"
       - "switch.external_ip:host-gateway"
@@ -122,7 +126,15 @@ services:
       - 443:443
     depends_on:
       - php
-      - db
+  mail:
+    image: mailhog/mailhog
+    container_name: fpbx-mail
+    ports:
+      - 1025:1025
+      - 8025:8025
+    hostname: mail
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 volumes:
   fpbx-db:
     name: fpbx-db-${POSTGRES_VERSION}
@@ -130,7 +142,7 @@ volumes:
     name: fpbx-fs-${FREESWITCH_VERSION}
   fs-config:
     name: fs-config-${FREESWITCH_VERSION}
-
-
-
-
+  php-modules:
+    name: php-modules-${PHP_VERSION}
+  fpbx-scripts:
+    name: fpbx-scripts-${PHP_VERSION}
