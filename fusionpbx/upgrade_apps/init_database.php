@@ -61,6 +61,12 @@
 	//load the uuid function
 	require BASE_DIR .'/resources/functions.php';
 
+	/*
+	 * +--------------------+
+	 * | Start of Functions |
+	 * +--------------------+
+	 */
+
 	function connect() {
 		$tries = 0;
 		while($tries++ < 10) {
@@ -90,6 +96,36 @@
 				return true;
 		}
 		return false;
+	}
+
+	function group_exists($con, $group_name, $schema = 'public') {
+		$statement = $con->prepare("SELECT COUNT(*)"
+			. " FROM $schema.v_groups"
+			. " WHERE group_name = :group_name");
+		$success = $statement->execute(['group_name' => $group_name]);
+		if($success !== false) {
+			$result = $statement->fetchAll(PDO::FETCH_COLUMN);
+			if(!empty($result) && count($result) > 0 && $result[0] >= 1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function group_uuid($con, $group_name, $schema = 'public') {
+		$statement = $con->prepare("SELECT g.group_uuid"
+			. " FROM $schema.v_groups g"
+			. " WHERE g.group_name = :group_name"
+			. " AND g.domain_uuid is null"
+			. " LIMIT 1");
+		$success = $statement->execute(['group_name' => $group_name]);
+		if($success !== false) {
+			$result = $statement->fetchAll(PDO::FETCH_COLUMN);
+			if(!empty($result)) {
+				return $result[0];
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -458,6 +494,12 @@ EOF;
 		//}
 	}
 
+	/*
+	 * +------------------+
+	 * | End of Functions |
+	 * +------------------+
+	 */
+
 	//startup
 	echo "+-----------------+\n";
 	echo "|+---------------+|\n";
@@ -520,11 +562,24 @@ EOF;
 	if(!has_table($con, 'v_groups')) {
 		echo "Creating v_groups\n";
 		write_schema($con, get_schema_from_app_config(CORE_DIR . '/groups'));
+	}
+
+	if(empty(group_uuid($con, 'superadmin'))) {
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','superadmin',80)");
+	}
+	if(empty(group_uuid($con, 'admin'))) {
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','admin',50)");
+	}
+	if(empty(group_uuid($con, 'supervisor'))) {
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','supervisor',40)");
+	}
+	if(empty(group_uuid($con, 'user'))) {
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','user',30)");
+	}
+	if(empty(group_uuid($con, 'agent'))) {
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','agent',20)");
+	}
+	if(empty(group_uuid($con, 'public'))) {
 		db_execute($con, "insert into v_groups(group_uuid,group_name,group_level) values ('" . uuid() . "','public',10)");
 	}
 
