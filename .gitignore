@@ -1,5 +1,6 @@
 !.keep
 !.gitkeep
+!.gitignore
 .env
 freeswitch/build/freeswitch/
 freeswitch/build/sofia-sip/
