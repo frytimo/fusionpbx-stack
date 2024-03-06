@@ -1,4 +1,4 @@
-!.keep
-cdr-csv/
-xml_cdr/
-freeswitch*
+**
+!.gitignore
+!/xml_cdr/
+!/cdr-csv/
