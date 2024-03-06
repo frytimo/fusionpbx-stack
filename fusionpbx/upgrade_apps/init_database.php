@@ -29,7 +29,9 @@
 	/*
 	 * This is designed to make an empty postgresql fusionpbx database usuable with core/upgrade/upgrade.php
 	 */
-
+	$date = date_create();
+	echo $date->format(DateTimeInterface::RFC2822) . "\n";
+	//echo $date->getTimestamp() . "\n";
 	// read the environment file from /etc/fusionpbx/config.conf
 	$settings = parse_ini_file('/etc/fusionpbx/config.conf');
 
@@ -511,7 +513,7 @@ EOF;
 	sleep(10);
 
 	//rewrite the event_socket_configuration
-	rewrite_event_socket_config();
+	//rewrite_event_socket_config();
 
 	//override session event_socket variables
 	$_SESSION['event_socket_ip_address'] = 'fs';
