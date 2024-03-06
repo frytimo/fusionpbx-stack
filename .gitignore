@@ -19,3 +19,7 @@ logs/php/xdebug/*
 /fusionpbx/.vscode/
 /postgres/mount/
 /freeswitch/conf.disabled/
+/freeswitch/images/
+/freeswitch/scripts/
+/freeswitch/storage/
+
