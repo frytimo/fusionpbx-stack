@@ -1,0 +1,5 @@
+**
+!.gitignore
+!extra_apps/
+!etc/
+!upgrade_apps/
