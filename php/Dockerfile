@@ -1,5 +1,5 @@
 ARG PHP_VERSION=8.1
-FROM php:${PHP_VERSION}-fpm
+FROM php:${PHP_VERSION}
 
 # install the php-extensions script to simplify dockerfile
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
@@ -19,6 +19,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
  gd \
  imagick \
  imap \
+ inotify \
  ldap \
  mcrypt \
  oauth \
@@ -32,7 +33,8 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
  sockets \
  snmp \
  shmop \
- zip
+ zip \
+ zmq
 
 # Install Supervisor
 RUN if [ -z $(which apk) ]; then DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt install -y supervisor gosu; else apk update && apk add --no-cache supervisor && mkdir /etc/supervisor.d; fi
@@ -51,6 +53,8 @@ RUN if [ -z $(which apk) ]; then apt-get clean && rm -rf /var/lib/apt/lists/*; f
 WORKDIR /
 
 COPY ./docker-entrypoint.sh /
+
+WORKDIR /var/www/fusionpbx
 
 RUN echo "alias ls='ls --color=auto'" >> ~/.bashrc
 
