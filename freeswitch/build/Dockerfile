@@ -9,7 +9,7 @@
 #
 #OS PREFRENCE
 #
-ARG DEBIAN_VERSION="11"
+ARG DEBIAN_VERSION="12"
 
 #
 # Get the base image
@@ -30,7 +30,9 @@ ENV FS_VOICEMAIL=/var/lib/freeswitch/storage/voicemail
 COPY ./freeswitch/ /usr/local/src/freeswitch/
 COPY ./sofia-sip/ /usr/local/src/sofia-sip/
 COPY ./spandsp/ /usr/local/src/spandsp/
+#
 # comment out next line if they are not already downloaded
+#
 COPY ./sounds/freeswitch-sounds-*.tar.gz /usr/local/src/freeswitch/
 
 RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
@@ -45,7 +47,7 @@ WORKDIR /
 #
 RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
   && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list \
-  && apt update && apt install -y php${PHP_VERSION}-dev
+  && apt update && apt install -y --no-install-recommends php${PHP_VERSION}-dev
 
 RUN echo "/usr/lib" | tee /etc/ld.so.conf.d/sofia_sip.so.conf && echo "/usr/lib" | tee /etc/ld.so.conf.d/spandsp.so.conf && ldconfig
 
@@ -67,16 +69,15 @@ RUN cd /usr/local/src/spandsp \
 RUN apt update && apt install -y libssl-dev
 
 RUN cd /usr/local/src/sofia-sip \
-  && git checkout tags/v1.13.16 -b build \
   && ./bootstrap.sh \
   && ./configure --prefix=/usr \
   && make -i -j$(nproc) \
   && make install
 
-#
+# libvpx-dev libtgowt-dev
 # Update / Install packages for freeswitch compile
 #
-RUN apt update && apt install -y libmpg123-dev libshout3-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev libspeexdsp-dev libldns-dev libedit-dev libavformat-dev libswscale-dev liblua5.3-dev doxygen libluajit-5.1-dev liblualib50-dev libpq-dev unixodbc-dev libopus-dev libsndfile-dev erlang-dev libmp3lame-dev libsnmp-dev python3-dev uuid-dev
+RUN apt update && apt install -y libmpg123-dev libshout3-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev libspeexdsp-dev libldns-dev libedit-dev libavformat-dev libswscale-dev liblua5.3-dev doxygen libluajit-5.1-dev libpq-dev unixodbc-dev libopus-dev libsndfile-dev erlang-dev libmp3lame-dev libsnmp-dev python3-dev uuid-dev
 
 RUN apt install -y libboost-dev bison
 
@@ -97,7 +98,7 @@ RUN ldconfig
 #
 # Switch to a release version
 #
-ARG FREESWITCH_VERSION=1.10.9
+ARG FREESWITCH_VERSION=1.10.10
 RUN cd /usr/local/src/freeswitch && git checkout tags/v$FREESWITCH_VERSION -b v$FREESWITCH_VERSION-compile
 
 RUN cd /usr/local/src/freeswitch \
@@ -119,7 +120,8 @@ RUN cd /usr/local/src/freeswitch \
   && sed -i "s|#applications/mod_curl|applications/mod_curl|g" modules.conf \
   && sed -i "s|#event_handlers/mod_erlang_event|event_handlers/mod_erlang_event|g" modules.conf \
   && sed -i "s|#formats/mod_shout|formats/mod_shout|g" modules.conf \
-  && sed -i "s|#formats/mod_pgsql|formats/mod_pgsql|g" modules.conf
+  && sed -i "s|#formats/mod_pgsql|formats/mod_pgsql|g" modules.conf \
+  && sed -i "s|#applications/mod_esl|applications/mod_esl|g" modules.conf
 
 #
 # configure freeswitch with forced directory structure
@@ -138,8 +140,11 @@ RUN cd /usr/local/src/freeswitch \
 #
 # make and install freeswitch using all cores
 #
-RUN cd /usr/local/src/freeswitch && ln -s /usr/bin/swig /usr/bin/swig3.0 && make CFLAGS="-Wno-error=format-truncation" CXXFLAGS="-Wno-error=format-truncation" -i -j$(nproc) && make swigall && cd /usr/local/src/freeswitch/libs/esl/php && make swigclean && make
-RUN cd /usr/local/src/freeswitch && make install
+RUN cd /usr/local/src/freeswitch && make CFLAGS="-Wno-error=format-truncation" CXXFLAGS="-Wno-error=format-truncation" -i -j$(nproc) && make && make install
+#
+# make and install ESL
+#
+RUN cd /usr/local/src/freeswitch/libs/esl && ln -s /usr/bin/swig /usr/bin/swig3.0 && cp php/ESL.php ~ && make swigclean && make phpmod && cd php && cp ~/ESL.php . && make install
 
 #
 # make the sound files seperately
@@ -180,7 +185,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 #
 RUN addgroup -q --gid 1000 fusionpbx && adduser --gecos "" --shell /bin/bash -q --no-create-home --uid 1000 --gid 1000 fusionpbx
 
-RUN echo "alias ls='ls --color=auto'" >> ~/.bashrc
+RUN echo "alias ls='ls --color=auto'" >> ~/.bashrc \
+  && echo "alias start='supervisorctl start'" >> ~/.bashrc \
+  && echo "alias stop='supervisorctl stop'" >> ~/.bashrc \
+  && echo "alias restart='supervisorctl restart'" >> ~/.bashrc
 
 RUN chown -R fusionpbx:fusionpbx /etc/freeswitch
 
