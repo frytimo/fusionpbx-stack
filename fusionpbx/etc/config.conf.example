@@ -33,6 +33,9 @@ switch.recordings.dir = /var/lib/freeswitch/recordings
 switch.storage.dir = /var/lib/freeswitch/storage
 switch.voicemail.dir = /var/lib/freeswitch/storage/voicemail
 switch.scripts.dir = /usr/share/freeswitch/scripts
+switch.event_socket.host = fs
+switch.event_socket.port = 8021
+switch.event_socket.password = ClueCon
 
 #switch xml handler
 xml_handler.fs_path = false
