@@ -16,3 +16,4 @@ fusionpbx/fusionpbx/
 postgres/db/pgdata/
 logs/php/xdebug/*
 /freeswitch/conf/
+/fusionpbx/.vscode/
