@@ -18,3 +18,4 @@ logs/php/xdebug/*
 /freeswitch/conf/
 /fusionpbx/.vscode/
 /postgres/mount/
+/freeswitch/conf.disabled/
