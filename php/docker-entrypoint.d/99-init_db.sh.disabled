@@ -1,0 +1,6 @@
+#!/bin/env sh
+
+_PHP=$(which php)
+
+cd /var/www/fusionpbx
+[ -f "core/upgrade/init_database.php" ] && ${_PHP} core/upgrade/init_database.php
