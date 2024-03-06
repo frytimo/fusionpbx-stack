@@ -1,11 +1,11 @@
 # CLI DEBUGGING
-#   export XDEBUG_CONFIG='client_host=host.docker.internal idekey=netbeans-xdebug'
+#   export XDEBUG_CONFIG='client_host=host.docker.internal idekey=${IDEKEY}'
 version: '3'
 services:
   db:
     image: postgres:${POSTGRES_VERSION}
     container_name: fpbx-db
-    restart: unless-stopped
+    restart: "no"
     environment:
       - POSTGRES_PASSWORD=fusionpbx
       - POSTGRES_USER=fusionpbx
@@ -26,6 +26,7 @@ services:
         - XDEBUG_VERSION=${XDEBUG_VERSION}
     image: fpbx-php:${PHP_VERSION}
     container_name: fpbx-php
+    restart: "no"
     hostname: php
     depends_on:
       - db
@@ -38,10 +39,13 @@ services:
     environment:
       #XDEBUG_CONFIG: "mode=trigger client_host=host.docker.internal idekey=${IDEKEY}"
       IDEKEY: "${IDEKEY}"
+    ports:
+      - 8080:8080
     volumes:
       - ./fusionpbx/fusionpbx:/var/www/fusionpbx
       - ./fusionpbx/etc/:/etc/fusionpbx
-      - ./fusionpbx/upgrade_apps/init_database.php:/var/www/fusionpbx/core/upgrade/init_database.php
+      - ./fusionpbx/upgrade_apps/init_database.php:/opt/fusionpbx/init_database.php
+#      - ./fusionpbx/upgrade_apps/init_database.php:/var/www/fusionpbx/core/upgrade/init_database.php
       #- ./fusionpbx/upgrade_apps/upgrade_menu.php:/var/www/fusionpbx/core/upgrade/upgrade_menu.php
       - ./php/docker-entrypoint.d:/docker-entrypoint.d:ro
       - ./php/socket:/var/run/php
@@ -49,7 +53,8 @@ services:
       - ./php/config:/usr/local/etc/php-fpm.d:ro
       - ./php/supervisord.conf:/etc/supervisord.conf:ro
       - ./logs/freeswitch:/var/log/freeswitch
-      - ./freeswitch/scripts:/usr/share/freeswitch/scripts
+#      - fpbx-scripts:/var/www/fusionpbx/app/switch/resources/scripts
+      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
       - ./freeswitch/db:/var/lib/freeswitch/db
       - ./freeswitch/images:/var/lib/freeswitch/images
@@ -60,6 +65,7 @@ services:
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
       - /usr/local/src/fusionpbx_extra_apps:/usr/local/src/fusionpbx_extra_apps
+      - php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
   fs:
     image: fpbx-fs:${FREESWITCH_VERSION}
     build:
@@ -68,6 +74,8 @@ services:
       args:
         - FREESWITCH_VERSION=${FREESWITCH_VERSION}
     container_name: fpbx-fs
+    restart: "no"
+    hostname: fs
     depends_on:
       - php
       - db
@@ -78,7 +86,7 @@ services:
       - ./fusionpbx/etc/:/etc/fusionpbx
       - ./freeswitch/setup:/docker-entrypoint.d
       - ./logs/freeswitch:/var/log/freeswitch
-      - ./freeswitch/scripts:/usr/share/freeswitch/scripts
+      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
       - ./freeswitch/db:/var/lib/freeswitch/db
       - ./freeswitch/images:/var/lib/freeswitch/images
@@ -87,18 +95,17 @@ services:
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
       - fs-config:/etc/freeswitch
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
+      - php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
+      - ./fusionpbx/fusionpbx:/var/www/fusionpbx
     extra_hosts:
       - "switch.internal_ip:127.0.0.1"
       - "switch.external_ip:host-gateway"
     ports:
-      - 5060:5060/udp
-      - 5060:5060/tcp
-      - 5061:5061/tcp
-      - 5080:5080/udp
-      - 5080:5080/tcp
-      - 5081:5081/tcp
-      - 8021:8021/tcp
-      - 8080:8080/tcp
+      - 5060-5090:5060-5090/udp
+      - 5060-5090:5060-5090/tcp
+      - 5556:5556/tcp
+      - 5672:5672/tcp
+      #- 8080:8080/tcp
   web:
     build:
       context: ./nginx
@@ -107,6 +114,8 @@ services:
         - NGINX_VERSION=${NGINX_VERSION}
     image: fpbx-nginx:${NGINX_VERSION}
     container_name: fpbx-web
+    restart: "no"
+    hostname: fusionpbx.local
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
     volumes:
@@ -122,6 +131,15 @@ services:
       - 443:443
     depends_on:
       - php
+  mail:
+    image: mailhog/mailhog
+    container_name: fpbx-mail
+    ports:
+      - 1025:1025
+      - 8025:8025
+    hostname: mail
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 volumes:
   fpbx-db:
     name: fpbx-db-${POSTGRES_VERSION}
@@ -129,7 +147,5 @@ volumes:
     name: fpbx-fs-${FREESWITCH_VERSION}
   fs-config:
     name: fs-config-${FREESWITCH_VERSION}
-
-
-
-
+  php-modules:
+    name: php-modules-${PHP_VERSION}
