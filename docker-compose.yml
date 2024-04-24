@@ -53,8 +53,9 @@ services:
       - ./php/config:/usr/local/etc/php-fpm.d:ro
       - ./php/supervisord.conf:/etc/supervisord.conf:ro
       - ./logs/freeswitch:/var/log/freeswitch
-#      - fpbx-scripts:/var/www/fusionpbx/app/switch/resources/scripts
-      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
+      - fpbx-scripts:/var/www/fusionpbx/app/switch/resources/scripts
+      - fpbx-scripts:/usr/share/freeswitch/scripts
+#      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
       - ./freeswitch/db:/var/lib/freeswitch/db
       - ./freeswitch/images:/var/lib/freeswitch/images
@@ -86,7 +87,8 @@ services:
       - ./fusionpbx/etc/:/etc/fusionpbx
       - ./freeswitch/setup:/docker-entrypoint.d
       - ./logs/freeswitch:/var/log/freeswitch
-      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
+      - fpbx-scripts:/usr/share/freeswitch/scripts
+#      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
       - ./freeswitch/db:/var/lib/freeswitch/db
       - ./freeswitch/images:/var/lib/freeswitch/images
@@ -149,3 +151,5 @@ volumes:
     name: fs-config-${FREESWITCH_VERSION}
   php-modules:
     name: php-modules-${PHP_VERSION}
+  fpbx-scripts:
+    name: fpbx-scripts-${FREESWITCH_VERSION}
