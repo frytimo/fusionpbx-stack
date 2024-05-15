@@ -1,4 +1,4 @@
 **
 !.gitignore
-!/etc/
-!/sounds/
+!etc/
+!sounds/

@@ -58,7 +58,7 @@ RUN apt update && apt install -y libtiff-dev
 #
 RUN cd /usr/local/src/spandsp \
   && git checkout 0d2e6ac65e0e8f53d652665a743015a88bf048d4 -b build \
-  && ./bootstrap.sh \
+  ; ./bootstrap.sh \
   && ./configure --prefix=/usr \
   && make -i -j$(nproc) \
   && make install
@@ -85,7 +85,7 @@ COPY ./swig/ /usr/local/src/swig/
 
 RUN cd /usr/local/src/swig \
   && git checkout -b build \
-  && ./autogen.sh \
+  ; ./autogen.sh \
   && ./configure --prefix=/usr \
   && make -j$(nproc) \
   && make install
