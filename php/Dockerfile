@@ -19,6 +19,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
  gd \
  imagick \
  imap \
+ inotify \
  ldap \
  mcrypt \
  oauth \
@@ -42,6 +43,11 @@ RUN if [ -z $(which apk) ]; then addgroup -q --gid 1000 fusionpbx && adduser --s
 
 # Create workdir
 RUN mkdir /etc/fusionpbx && chown fusionpbx:fusionpbx /etc/fusionpbx && mkdir -p /var/www/fusionpbx && touch /var/www/fusionpbx/docker-volume-not-mounted && chown fusionpbx:fusionpbx /var/www/fusionpbx
+
+#
+# Install dependencies for fusionpbx
+#
+RUN if [ -z $(which apk) ]; then DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt install -y libtiff-tools ghostscript ghostscript-x; else apk update && apk add --no-cache libtiff-tools ghostscript ghostscript-x; fi
 
 #
 # Clean up Debian files
