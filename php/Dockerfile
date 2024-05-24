@@ -1,17 +1,28 @@
-ARG PHP_VERSION=8.1
+ARG PHP_VERSION=8.1-fpm-alpine
 FROM php:${PHP_VERSION}
 
 # install the php-extensions script to simplify dockerfile
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 # These are some packages that contain commands FusionPBX runs in a shell
-RUN if [ -z $(which apk) ]; then DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt install -y procps uptimed lsb-release wget; else apk update && apk add --no-cache wget procps; fi
+RUN if [ -z $(which apk) ]; then DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt install -y procps uptimed lsb-release wget git; else apk update && apk add --no-cache git wget procps uptimed; fi
 
-ARG XDEBUG_VERSION=3.2.1
+WORKDIR /usr/local/src
+
+RUN git clone https://github.com/xdebug/xdebug.git
+
+WORKDIR /usr/local/src/xdebug
+
+# PHP version 8.1 or higher is default
+ARG XDEBUG_VERSION=3.3.2
+
+RUN git checkout tags/${XDEBUG_VERSION} -b ${XDEBUG_VERSION}
+
+RUN cd /usr/local/src/xdebug/ && ./rebuild.sh
+
 # Install Postgres extension
 RUN chmod +x /usr/local/bin/install-php-extensions && \
  install-php-extensions \
- xdebug-^${XDEBUG_VERSION} \
  bcmath \
  bz2 \
  @composer \
@@ -29,12 +40,10 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
  pdo_pgsql \
  pgsql \
  soap \
- sodium \
  sockets \
  snmp \
  shmop \
- zip \
- zmq
+ zip
 
 # Install Supervisor
 RUN if [ -z $(which apk) ]; then DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt install -y supervisor gosu; else apk update && apk add --no-cache supervisor && mkdir /etc/supervisor.d; fi
@@ -53,10 +62,6 @@ RUN if [ -z $(which apk) ]; then apt-get clean && rm -rf /var/lib/apt/lists/*; f
 WORKDIR /
 
 COPY ./docker-entrypoint.sh /
-
-WORKDIR /var/www/fusionpbx
-
-RUN echo "alias ls='ls --color=auto'" >> ~/.bashrc
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 

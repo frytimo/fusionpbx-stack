@@ -1,6 +1,5 @@
 # CLI DEBUGGING
 #   export XDEBUG_CONFIG='client_host=host.docker.internal idekey=${IDEKEY}'
-version: '3'
 services:
   db:
     image: postgres:${POSTGRES_VERSION}
@@ -32,21 +31,19 @@ services:
       - db
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # Activating the environment variable has a side effect of always trying to connect to the host
-    # no matter how the xdebug-helper extension is set. To use the CLI you can either uncomment
-    # the environment variables section below or export the variable when inside the container.
-    # export XDEBUG_CONFIG="mode=trigger client_host=host.docker.internal idekey=${IDEKEY}"
+    ## Activating the environment variable has a side effect of always trying to connect to the host
+    ## no matter how the xdebug-helper extension is set. To use the CLI you can either uncomment
+    ## the environment variables section below or export the variable when inside the container.
+    ## export XDEBUG_CONFIG="mode=trigger client_host=host.docker.internal idekey=${IDEKEY}"
     environment:
-      #XDEBUG_CONFIG: "mode=trigger client_host=host.docker.internal idekey=${IDEKEY}"
+      ##XDEBUG_CONFIG: "mode=trigger client_host=host.docker.internal idekey=${IDEKEY}"
       IDEKEY: "${IDEKEY}"
     ports:
       - 8080:8080
     volumes:
-      - ./fusionpbx/fusionpbx:/var/www/fusionpbx
+      - /var/www/fusionpbx:/var/www/fusionpbx
       - ./fusionpbx/etc/:/etc/fusionpbx
-      - ./fusionpbx/upgrade_apps/init_database.php:/opt/fusionpbx/init_database.php
-#      - ./fusionpbx/upgrade_apps/init_database.php:/var/www/fusionpbx/core/upgrade/init_database.php
-      #- ./fusionpbx/upgrade_apps/upgrade_menu.php:/var/www/fusionpbx/core/upgrade/upgrade_menu.php
+      - ./fusionpbx/opt:/opt
       - ./php/docker-entrypoint.d:/docker-entrypoint.d:ro
       - ./php/socket:/var/run/php
       - ./php/config:/usr/local/etc/php:ro
@@ -55,7 +52,7 @@ services:
       - ./logs/freeswitch:/var/log/freeswitch
       - fpbx-scripts:/var/www/fusionpbx/app/switch/resources/scripts
       - fpbx-scripts:/usr/share/freeswitch/scripts
-#      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
+##      - ./fusionpbx/fusionpbx/app/switch/resources/scripts:/usr/share/freeswitch/scripts
       - ./freeswitch/sounds:/usr/share/freeswitch/sounds
       - ./freeswitch/db:/var/lib/freeswitch/db
       - ./freeswitch/images:/var/lib/freeswitch/images
@@ -66,7 +63,7 @@ services:
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
       - /usr/local/src/fusionpbx_extra_apps:/usr/local/src/fusionpbx_extra_apps
-      - php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
+    #  - php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
   fs:
     image: fpbx-fs:${FREESWITCH_VERSION}
     build:
@@ -97,7 +94,7 @@ services:
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
       - fs-config:/etc/freeswitch
       - fpbx-fs-modules:/usr/lib/freeswitch/mod
-      - php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
+      #- php-modules:/usr/local/lib/php/extensions/no-debug-non-zts-20210902
       - ./fusionpbx/fusionpbx:/var/www/fusionpbx
     extra_hosts:
       - "switch.internal_ip:127.0.0.1"
@@ -107,7 +104,7 @@ services:
       - 5060-5090:5060-5090/tcp
       - 5556:5556/tcp
       - 5672:5672/tcp
-      #- 8080:8080/tcp
+      - 8021:8021/tcp
   web:
     build:
       context: ./nginx
@@ -121,7 +118,7 @@ services:
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
     volumes:
-      - ./fusionpbx/fusionpbx:/var/www/fusionpbx
+      - /var/www/fusionpbx:/var/www/fusionpbx
       - ./nginx/config:/etc/nginx
       - ./php/socket:/var/run/php
       - /dev/shm/fusionpbx:/var/cache/fusionpbx
@@ -149,7 +146,5 @@ volumes:
     name: fpbx-fs-${FREESWITCH_VERSION}
   fs-config:
     name: fs-config-${FREESWITCH_VERSION}
-  php-modules:
-    name: php-modules-${PHP_VERSION}
   fpbx-scripts:
     name: fpbx-scripts-${FREESWITCH_VERSION}

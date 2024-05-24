@@ -3,4 +3,28 @@
 _PHP=$(which php)
 
 cd /var/www/fusionpbx
-[ -f "core/upgrade/init_database.php" ] && ${_PHP} core/upgrade/init_database.php
+
+# Define the path to the marker file
+MARKER_FILE="core/upgrade/.db_init"
+
+# Check if the marker file exists
+if [ ! -f "$MARKER_FILE" ]; then
+    echo "Marker file does not exist. Running the PHP script..."
+
+    # Execute the PHP script
+    [ -f "/opt/fusionpbx/init_database.php" ] && ${_PHP} /opt/fusionpbx/init_database.php
+
+    # Check if the PHP script was successful
+    if [ $? -eq 0 ]; then
+        echo "PHP script executed successfully. Creating the marker file..."
+
+        # Create an empty marker file
+        touch "$MARKER_FILE"
+
+        echo "Marker file created: $MARKER_FILE"
+    else
+        echo "PHP script failed to execute."
+    fi
+else
+    echo "Marker file exists. No need to run the PHP script."
+fi

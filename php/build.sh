@@ -2,4 +2,4 @@
 set -a
 . ../.env
 
-docker build -t fpbx-php:${PHP_VERSION} --build-arg PHP_VERSION=${PHP_VERSION} --build-arg XDEBUG_VERSION=${XDEBUG_VERSION} .
+docker build --no-cache -t fpbx-php:${PHP_VERSION} --build-arg PHP_VERSION=${PHP_VERSION} --build-arg XDEBUG_VERSION=${XDEBUG_VERSION} .
